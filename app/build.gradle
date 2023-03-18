@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.quizup'
+    namespace 'com.quizmakers.quizup'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.quizup"
+        applicationId "com.quizmakers.quizup"
         minSdk 24
         targetSdk 33
         versionCode 1

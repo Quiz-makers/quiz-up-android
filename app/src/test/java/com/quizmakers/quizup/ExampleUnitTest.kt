@@ -1,4 +1,4 @@
-package com.example.quizup
+package com.quizmakers.quizup
 
 import org.junit.Test
 

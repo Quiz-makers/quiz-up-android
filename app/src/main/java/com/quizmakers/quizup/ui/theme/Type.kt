@@ -1,4 +1,4 @@
-package com.example.quizup.ui.theme
+package com.quizmakers.quizup.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
