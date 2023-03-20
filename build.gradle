@@ -3,6 +3,8 @@ buildscript {
         compileSdk = 33
         targetSdk = 33
         minSdk = 23
+        jvmVersion = '1.8'
+        javaVersion = JavaVersion.VERSION_1_8
         compose_version = '1.4.0-alpha05'
         activity_compose_version = '1.6.1'
         ksp_version = '1.8.0-1.0.9'

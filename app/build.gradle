@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'com.quizmakers.quizup'
-    compileSdk 33
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         applicationId "com.quizmakers.quizup"
-        minSdk 24
-        targetSdk 33
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
         versionCode 1
         versionName "1.0"
 
@@ -75,6 +75,8 @@ android {
 
 dependencies {
 
+    implementation project("::engine")
+
     implementation "androidx.core:core-ktx:$ktx_version"
     implementation "androidx.compose.material:material:$compose_material_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$runtime_ktx_version"
@@ -108,9 +110,5 @@ dependencies {
     implementation "io.github.raamcosta.compose-destinations:core:$raamcosta_version"
     implementation "io.github.raamcosta.compose-destinations:animations-core:$raamcosta_version"
     ksp "io.github.raamcosta.compose-destinations:ksp:$raamcosta_version"
-    // Retrofit + networking
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
-    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+
 }

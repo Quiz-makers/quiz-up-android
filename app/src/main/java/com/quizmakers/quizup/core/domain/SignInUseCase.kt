@@ -1,9 +1,8 @@
 package com.quizmakers.quizup.core.domain
 
-import com.quizmakers.quizup.core.api.QuizUpApiService
+import com.quizmakers.core.data.auth.remote.AuthService
+import com.quizmakers.core.domain.auth.useCases.CoreSignInUseCase
 import org.koin.core.annotation.Factory
 
 @Factory
-class SignInUseCase(private val api: QuizUpApiService) {
-    suspend operator fun invoke() = api.signIn("mockName")
-}
+class SignInUseCase(private val api: AuthService) : CoreSignInUseCase(api = api)
