@@ -1,4 +1,4 @@
-package com.quizmakers.quizup
+package com.quizmakers.quizup.core.app
 
 import android.app.Application
 import com.quizmakers.core.di.CoreModulesList

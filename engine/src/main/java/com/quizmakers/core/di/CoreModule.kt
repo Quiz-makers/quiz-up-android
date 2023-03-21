@@ -1,8 +1,7 @@
 package com.quizmakers.core.di
 
-import com.quizmakers.core.base.ApiType
+import com.quizmakers.core.api.Server
 import com.quizmakers.core.data.quizzes.remote.QuizzesService
-import com.quizmakers.core.base.BaseUrlInterceptor
 import com.quizmakers.core.data.auth.remote.AuthService
 import okhttp3.OkHttpClient
 import org.koin.core.annotation.ComponentScan
@@ -15,10 +14,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Module
 @ComponentScan("com.quizmakers.core")
 class CoreModule {
-
     @Single
     fun provideRetrofit(client: OkHttpClient) = Retrofit.Builder()
-        .baseUrl(ApiType.AUTH.url)
+        .baseUrl(Server.BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
@@ -29,16 +27,9 @@ class CoreModule {
         }
 
     @Single
-    fun provideBaseUrlInterceptor(
-    ): BaseUrlInterceptor = BaseUrlInterceptor()
-
-
-    @Single
     fun provideOkHttpClient(
-        baseUrlInterceptor: BaseUrlInterceptor,
         interceptor: HttpLoggingInterceptor
     ) = OkHttpClient.Builder()
-       // .addInterceptor(baseUrlInterceptor) //TODO Add this after /quizzes url will be available
         .addInterceptor(interceptor)
         .build()
 
