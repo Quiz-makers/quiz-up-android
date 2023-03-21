@@ -1,6 +1,7 @@
-package com.quizmakers.quizup
+package com.quizmakers.quizup.core.app
 
 import android.app.Application
+import com.quizmakers.core.di.CoreModulesList
 import com.quizmakers.quizup.core.di.AppModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.ksp.generated.module
@@ -17,5 +18,6 @@ class QuizUpApp : Application() {
             androidContext(this@QuizUpApp)
             modules(AppModule().module)
         }
+        CoreModulesList().init()
     }
 }

@@ -1,0 +1,39 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp' version "$ksp_version"
+}
+
+apply from: "$rootProject.rootDir/core-library.gradle"
+
+android {
+    namespace 'com.quizmakers.core'
+
+    libraryVariants.all { variant ->
+        variant.buildConfigField "String", "BASE_URL", "\"https://www.google.com\""
+
+        kotlin.sourceSets {
+            getByName(variant.name) {
+                kotlin.srcDir("build/generated/ksp/${variant.name}/kotlin")
+            }
+        }
+    }
+    ksp {
+        arg("compose-destinations.mode", "destinations")
+        arg("compose-destinations.moduleName", "engine")
+    }
+}
+
+dependencies {
+    // Koin
+    implementation "io.insert-koin:koin-core:$koin_version"
+    implementation "io.insert-koin:koin-android:$koin_version"
+    implementation "io.insert-koin:koin-annotations:$koin_ksp_version"
+    ksp "io.insert-koin:koin-ksp-compiler:$koin_ksp_version"
+    // Retrofit + networking
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+}
