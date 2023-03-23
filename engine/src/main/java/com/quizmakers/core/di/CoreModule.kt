@@ -1,5 +1,6 @@
 package com.quizmakers.core.di
 
+import com.quizmakers.core.api.NullOnEmptyConverterFactory
 import com.quizmakers.core.api.Server
 import com.quizmakers.core.data.quizzes.remote.QuizzesService
 import com.quizmakers.core.data.auth.remote.AuthService
@@ -17,6 +18,7 @@ class CoreModule {
     @Single
     fun provideRetrofit(client: OkHttpClient) = Retrofit.Builder()
         .baseUrl(Server.BASE_URL)
+        .addConverterFactory(NullOnEmptyConverterFactory())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 

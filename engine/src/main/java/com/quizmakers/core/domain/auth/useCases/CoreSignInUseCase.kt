@@ -6,6 +6,6 @@ import org.koin.core.annotation.Factory
 
 @Factory
 open class CoreSignInUseCase(private val api: AuthService) {
-    suspend operator fun invoke(userAuthenticate: UserAuthenticateRequest) =
-        api.signIn(userAuthenticate)
+    suspend operator fun invoke(email: String, password: String) =
+        api.signIn(UserAuthenticateRequest(email = email, password = password))
 }
