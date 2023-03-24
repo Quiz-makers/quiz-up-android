@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
@@ -39,6 +38,8 @@ fun BaseTextField(
     placeholderText: String,
     focusManager: FocusManager,
     isPassword: Boolean = false,
+    isError: Boolean = false,
+    resetError: () -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
     keyboardActions: KeyboardActions = KeyboardActions(
         onNext = {
@@ -49,8 +50,10 @@ fun BaseTextField(
     OutlinedTextField(
         value = valueState.value,
         onValueChange = { newText ->
+            if (isError) resetError()
             valueState.value = newText
         },
+        isError = isError,
         singleLine = true,
         maxLines = 1,
         label = { Text(text = labelText) },
