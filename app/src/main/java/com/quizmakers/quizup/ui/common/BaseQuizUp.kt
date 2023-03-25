@@ -3,10 +3,7 @@ package com.quizmakers.quizup.ui.common
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -30,6 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.quizmakers.quizup.ui.theme.DarkBlue
+import com.quizmakers.quizup.ui.theme.RedError
 
 @Composable
 fun BaseTextField(
@@ -38,31 +36,36 @@ fun BaseTextField(
     placeholderText: String,
     focusManager: FocusManager,
     isPassword: Boolean = false,
-    isError: Boolean = false,
-    resetError: () -> Unit = {},
+    errorMessage: String,
+    onResetError: () -> Unit,
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
     keyboardActions: KeyboardActions = KeyboardActions(
         onNext = {
             focusManager.moveFocus(FocusDirection.Down)
         }
     ),
+    isError: Boolean = false
 ) {
-    OutlinedTextField(
-        value = valueState.value,
-        onValueChange = { newText ->
-            if (isError) resetError()
-            valueState.value = newText
-        },
-        isError = isError,
-        singleLine = true,
-        maxLines = 1,
-        label = { Text(text = labelText) },
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        placeholder = { Text(text = placeholderText) },
-        modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions
-    )
+    Column {
+        OutlinedTextField(
+            value = valueState.value,
+            onValueChange = { newText ->
+                errorMessage?.let { onResetError() }
+                valueState.value = newText
+            },
+            isError = errorMessage.isNotBlank() || isError,
+            singleLine = true,
+            maxLines = 1,
+            label = { Text(text = labelText) },
+            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            placeholder = { Text(text = placeholderText) },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions
+        )
+        if (errorMessage.isNotBlank())
+            Text(text = errorMessage, color = RedError, fontSize = 12.sp)
+    }
 }
 
 @Composable

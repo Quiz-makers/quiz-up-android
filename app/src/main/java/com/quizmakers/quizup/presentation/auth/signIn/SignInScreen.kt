@@ -1,7 +1,5 @@
 package com.quizmakers.quizup.presentation.auth.signIn
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -13,9 +11,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color.Companion.Cyan
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -24,10 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.presentation.auth.destinations.SignOutScreenDestination
-import com.quizmakers.quizup.ui.common.BaseButton
-import com.quizmakers.quizup.ui.common.BaseIndicator
-import com.quizmakers.quizup.ui.common.BaseTextField
+import com.quizmakers.quizup.ui.common.*
 import com.quizmakers.quizup.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -40,60 +37,65 @@ import org.koin.androidx.compose.koinViewModel
 fun SignInScreen(
     navigator: DestinationsNavigator,
     signInViewModel: SignInViewModel = koinViewModel(),
+    snackbarHandler: SnackbarHandler,
 ) {
-    val context = LocalContext.current
+    val email = remember { mutableStateOf(TextFieldValue("")) }
+    val password = remember { mutableStateOf(TextFieldValue("")) }
+    val isError = remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         signInViewModel.authEvent.collect {
             when (it) {
-                is SignInViewModel.AuthEvent.Error -> mToast(context, it.error)
-                SignInViewModel.AuthEvent.Success -> mToast(context, "Success")
+                is BaseViewModel.AuthEvent.Error -> {
+                    isError.value = true
+                    snackbarHandler.showErrorSnackbar(message = it.error)
+                }
+                BaseViewModel.AuthEvent.Success -> {
+                    isError.value = false
+                    //navToDashboard
+                }
             }
         }
     }
     when (val authState = signInViewModel.authState.collectAsStateWithLifecycle().value) {
         SignInViewModel.AuthState.Loading -> LoadingScreen()
-        is SignInViewModel.AuthState.Error -> {
+        else -> {
             SignInScreen(
-                authState = authState,
                 navigateToSignUpScreen = navigator::navigateToSignOutScreen,
-                signInViewModel = signInViewModel::signIn
-            )
-        }
-        SignInViewModel.AuthState.None -> {
-            SignInScreen(
+                signIn = signInViewModel::signIn,
                 authState = authState,
-                navigateToSignUpScreen = navigator::navigateToSignOutScreen,
-                signInViewModel = signInViewModel::signIn
+                email = email,
+                password = password,
+                isError = isError
             )
         }
     }
 
 }
 
-// Function to generate a Toast
-private fun mToast(context: Context, text: String) {
-    Toast.makeText(context, "This is a Sample Toast $text", Toast.LENGTH_LONG).show()
-}
-
-@Composable
-private fun LoadingScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        BaseIndicator()
-    }
-}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SignInScreen(
     navigateToSignUpScreen: () -> Unit,
-    signInViewModel: (String, String) -> Unit,
+    signIn: (String, String) -> Unit,
     authState: SignInViewModel.AuthState,
+    email: MutableState<TextFieldValue>,
+    password: MutableState<TextFieldValue>,
+    isError: MutableState<Boolean>
 
-    ) {
-    val email = remember { mutableStateOf(TextFieldValue("")) }
-    val password = remember { mutableStateOf(TextFieldValue("")) }
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
+    val emailErrorMessage = remember { mutableStateOf("") }
+    val passwordErrorMessage = remember { mutableStateOf("") }
+
+    validateError(
+        authState,
+        emailErrorMessage,
+        passwordErrorMessage
+    )
 
     Box(
         modifier = Modifier
@@ -111,7 +113,13 @@ private fun SignInScreen(
                 valueState = email,
                 labelText = "Wprowadź email",
                 placeholderText = "email",
-                focusManager = focusManager
+                isError = isError.value,
+                onResetError = {
+                    isError.value = false
+                    emailErrorMessage.value = ""
+                },
+                errorMessage = emailErrorMessage.value,
+                focusManager = focusManager,
             )
             Spacer(modifier = Modifier.height(16.dp))
             BaseTextField(
@@ -119,20 +127,24 @@ private fun SignInScreen(
                 labelText = "Wprowadź hasło",
                 placeholderText = "hasło",
                 focusManager = focusManager,
+                isError = isError.value,
                 isPassword = true,
+                errorMessage = passwordErrorMessage.value,
+                onResetError = {
+                    isError.value = false
+                    passwordErrorMessage.value = ""
+                },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        signInViewModel.invoke(email.value.text, password.value.text)
-                        keyboardController?.hide()
+                        signIn(signIn, email, password, keyboardController)
                     })
             )
             Spacer(modifier = Modifier.weight(0.1f))
             BaseButton(
                 label = "Zaloguj",
                 onClick = {
-                    signInViewModel.invoke(email.value.text, password.value.text)
-                    keyboardController?.hide()
+                    signIn(signIn, email, password, keyboardController)
                 }
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -140,6 +152,36 @@ private fun SignInScreen(
             FooterSignInScreen(onClick = navigateToSignUpScreen)
         }
     }
+}
+
+@Composable
+private fun validateError(
+    authState: SignInViewModel.AuthState,
+    emailErrorMessage: MutableState<String>,
+    passwordErrorMessage: MutableState<String>
+) {
+    when (authState) {
+        is SignInViewModel.AuthState.Error -> {
+            emailErrorMessage.value =
+                authState.errorField.find { it.signInField == SignInViewModel.SignInFieldInfo.EMAIL }?.error
+                    ?: ""
+            passwordErrorMessage.value =
+                authState.errorField.find { it.signInField == SignInViewModel.SignInFieldInfo.PASSWORD }?.error
+                    ?: ""
+        }
+        else -> Unit
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun signIn(
+    signInViewModel: (String, String) -> Unit,
+    email: MutableState<TextFieldValue>,
+    password: MutableState<TextFieldValue>,
+    keyboardController: SoftwareKeyboardController?
+) {
+    signInViewModel.invoke(email.value.text, password.value.text)
+    keyboardController?.hide()
 }
 
 @Composable
@@ -230,7 +272,10 @@ private fun SignInScreenPreview() {
         SignInScreen(
             navigateToSignUpScreen = {},
             { _, _ -> },
-             authState = SignInViewModel.AuthState.None
+            authState = SignInViewModel.AuthState.None,
+            email = remember { mutableStateOf(TextFieldValue("")) },
+            password = remember { mutableStateOf(TextFieldValue("")) },
+            isError = remember { mutableStateOf(true) }
         )
     }
 }

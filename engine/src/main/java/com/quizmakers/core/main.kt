@@ -29,7 +29,5 @@ fun main() {
             email = "lukieoo@gmail.com",
             password = "test1234",
         )
-        println(TestImplementation().testModule.invoke(userAuthenticate))
-        println("-----------------------------")
     }
 }

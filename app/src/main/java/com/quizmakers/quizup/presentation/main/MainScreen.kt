@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -18,6 +20,8 @@ import com.quizmakers.quizup.core.navigation.NavGraphs
 import com.quizmakers.quizup.core.navigation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.dependency
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
+import com.quizmakers.quizup.ui.common.QuizUpSnackbar
+import com.quizmakers.quizup.ui.common.SnackbarHandler
 
 @OptIn(
     ExperimentalAnimationApi::class, ExperimentalMaterialNavigationApi::class,
@@ -34,6 +38,8 @@ fun MainScreen(
         )
         val bottomSheetNavigator = rememberBottomSheetNavigator(sheetState = sheetState)
         val navController = rememberAnimatedNavController()
+        val scope = rememberCoroutineScope()
+        val snackbarState = SnackbarHandler(scope)
         navController.navigatorProvider.addNavigator(bottomSheetNavigator)
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -44,11 +50,21 @@ fun MainScreen(
             ) {
                 AppNavigation(
                     navController = navController,
-                    onOpenSettings = { dependency(sheetState) },
+                    onOpenSettings = {
+                        dependency(sheetState)
+                        dependency(snackbarState)
+                    },
                     startRoute = NavGraphs.auth, //TODO IF LOGGED ADD
                     navGraph = RootNavGraph
                 )
             }
+            QuizUpSnackbar(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .align(Alignment.BottomCenter),
+                snackbarHandler = snackbarState,
+                navController = navController
+            )
         }
 
 
