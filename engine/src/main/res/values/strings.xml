@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_internal">Houston, mamy problem po stronie serwera. Spróbuj ponownie za kilka minut.</string>
+    <string name="error_bad_request">Błąd walidacji. Sprawdź parametry wejściowe</string>
+    <string name="error_unknown">Ups… coś poszło nie tak…</string>
+    <string name="access_denied">Błędne dane logowania</string>
+</resources>

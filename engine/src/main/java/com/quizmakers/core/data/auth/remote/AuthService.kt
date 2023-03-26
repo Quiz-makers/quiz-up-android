@@ -5,9 +5,9 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface AuthService {
-    @GET("auth/authenticate")
-    suspend fun signIn(@Body userAuthenticate: UserAuthenticateRequest): String
+    @POST("auth/authenticate")
+    suspend fun signIn(@Body userAuthenticate: UserAuthenticateRequest): Unit
 
     @POST("auth/register")
-    suspend fun signUp(@Body userRegisterRequest: UserRegisterRequest): String
+    suspend fun signUp(@Body userRegisterRequest: UserRegisterRequest): Unit
 }

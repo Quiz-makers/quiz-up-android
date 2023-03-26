@@ -50,10 +50,14 @@ internal fun AppNavigation(
     )
 }
 
+enum class AppRouteEnum(var routString: String) {
+    AUTH("auth"), QUIZZES("quizzes"), ROOT("root")
+}
+
 object NavGraphs {
 
     val auth = object : NavGraphSpec {
-        override val route = "main"
+        override val route = AppRouteEnum.AUTH.routString
 
         override val startRoute = SignInScreenDestination
 
@@ -63,7 +67,7 @@ object NavGraphs {
         ).associateBy { it.route }
     }
     val quizzes = object : NavGraphSpec {
-        override val route = "quizzes"
+        override val route = AppRouteEnum.QUIZZES.routString
 
         override val startRoute = SignInScreenDestination
 
@@ -76,7 +80,7 @@ object NavGraphs {
 @ExperimentalComposeUiApi
 object RootNavGraph : NavGraphSpec {
 
-    override val route = "root"
+    override val route = AppRouteEnum.ROOT.routString
 
     override val destinationsByRoute = emptyMap<String, DestinationSpec<*>>()
 
