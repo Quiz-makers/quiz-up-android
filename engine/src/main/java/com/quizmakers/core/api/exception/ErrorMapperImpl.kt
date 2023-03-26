@@ -19,10 +19,11 @@ class ErrorMapperImpl(private val context: Context) : ErrorMapper {
         return when (serverException) {
             is ServerException.Internal -> getMessage(R.string.error_internal)
             is ServerException.BadRequest -> getMessage(R.string.error_bad_request)
+            is ServerException.AccessDenied -> getMessage(R.string.access_denied)
             else -> getMessage(R.string.error_unknown)
         }
     }
 
-    private fun getMessage(@StringRes stringRes: Int) = context.getString(stringRes)
+    override fun getMessage(@StringRes stringRes: Int) = context.getString(stringRes)
 
 }

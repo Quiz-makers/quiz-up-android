@@ -1,9 +1,13 @@
 package com.quizmakers.quizup.presentation.auth.signOut
 
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.quizmakers.core.api.exception.ErrorMapper
 import com.quizmakers.core.api.exception.ErrorWrapper
+import com.quizmakers.core.data.auth.remote.ErrorCatcher
+import com.quizmakers.core.data.auth.remote.Errors
 import com.quizmakers.core.domain.auth.useCases.CoreSignUpUseCase
+import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +26,7 @@ class SignOutViewModel(
     fun signOut(name: String, surname: String, userName: String, email: String, password: String) {
         if (validate(name, surname, userName, email, password)) {
             viewModelScope.launch {
+                errorWrapper.errorBody = null
                 _authState.emit(AuthState.Loading)
                 runCatching {
                     getSignUpUseCase.invoke(name, surname, userName, email, password)
@@ -30,12 +35,7 @@ class SignOutViewModel(
                     sendMessageEvent(AuthEvent.Error(error))
                     _authState.emit(
                         AuthState.Error(
-                            arrayListOf(
-                                ErrorValidation(
-                                    error,
-                                    SignInFieldInfo.ONLY_MESSAGE
-                                )
-                            )
+                            parseErrorBodyToValidateForm(error)
                         )
                     )
                 }.onSuccess {
@@ -45,6 +45,24 @@ class SignOutViewModel(
         }
     }
 
+    private fun parseErrorBodyToValidateForm(error: String) =
+        errorWrapper.errorBody?.let { errorBody ->
+            Gson().fromJson(
+                errorBody,
+                ErrorCatcher::class.java
+            ).errors.map { errors ->
+                ErrorValidation(
+                    errors.message,
+                    errors.toSignOutFieldInfo()
+                )
+            } as ArrayList
+        } ?: arrayListOf(
+            ErrorValidation(
+                error,
+                SignOutFieldInfo.ONLY_MESSAGE
+            )
+        )
+
     private fun validate(
         name: String,
         surname: String,
@@ -53,44 +71,43 @@ class SignOutViewModel(
         password: String
     ): Boolean {
         val errorField: ArrayList<ErrorValidation> = arrayListOf()
-        val emptyInfoState = "To pole nie może być puste"
         if (name.isEmpty()) {
             errorField.add(
                 ErrorValidation(
-                    emptyInfoState,
-                    SignInFieldInfo.NAME
+                    errorMapper.getMessage(R.string.empty_field),
+                    SignOutFieldInfo.NAME
                 )
             )
         }
         if (surname.isEmpty()) {
             errorField.add(
                 ErrorValidation(
-                    emptyInfoState,
-                    SignInFieldInfo.SURNAME
+                    errorMapper.getMessage(R.string.empty_field),
+                    SignOutFieldInfo.SURNAME
                 )
             )
         }
         if (userName.isEmpty()) {
             errorField.add(
                 ErrorValidation(
-                    emptyInfoState,
-                    SignInFieldInfo.USERNAME
+                    errorMapper.getMessage(R.string.empty_field),
+                    SignOutFieldInfo.USERNAME
                 )
             )
         }
         if (email.isEmpty()) {
             errorField.add(
                 ErrorValidation(
-                    emptyInfoState,
-                    SignInFieldInfo.EMAIL
+                    errorMapper.getMessage(R.string.empty_field),
+                    SignOutFieldInfo.EMAIL
                 )
             )
         }
         if (password.isEmpty()) {
             errorField.add(
                 ErrorValidation(
-                    emptyInfoState,
-                    SignInFieldInfo.PASSWORD
+                    errorMapper.getMessage(R.string.empty_field),
+                    SignOutFieldInfo.PASSWORD
                 )
             )
         }
@@ -100,13 +117,24 @@ class SignOutViewModel(
         return errorField.isEmpty()
     }
 
-    enum class SignInFieldInfo {
+    fun Errors.toSignOutFieldInfo(): SignOutFieldInfo {
+        return when (this.field.uppercase()) {
+            "EMAIL" -> SignOutFieldInfo.EMAIL
+            "NAME" -> SignOutFieldInfo.NAME
+            "SURNAME" -> SignOutFieldInfo.SURNAME
+            "USERNAME" -> SignOutFieldInfo.USERNAME
+            "PASSWORD" -> SignOutFieldInfo.PASSWORD
+            else -> SignOutFieldInfo.ONLY_MESSAGE
+        }
+    }
+
+    enum class SignOutFieldInfo {
         NAME, SURNAME, USERNAME, EMAIL, PASSWORD, ONLY_MESSAGE
     }
 
     data class ErrorValidation(
         val error: String,
-        val signInField: SignInFieldInfo,
+        val signInField: SignOutFieldInfo,
     )
 
 

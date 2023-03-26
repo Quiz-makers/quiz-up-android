@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">QuizUp</string>
+    <string name="signout_screen_subtitle">Wypełnij wymagne pola danymi</string>
+    <string name="register">Zarejestruj się</string>
+    <string name="enter_your_password">Wprowadź hasło</string>
+    <string name="password">hasło</string>
+    <string name="email">email</string>
+    <string name="enter_email">Wprowadź email</string>
+    <string name="user_name">nick</string>
+    <string name="enter_user_name">Wprowadź nick</string>
+    <string name="surname">nazwisko</string>
+    <string name="enter_last_name">Wprowadź nazwisko</string>
+    <string name="name">imię</string>
+    <string name="enter_name">Wprowadź imię</string>
+    <string name="empty_field">To pole nie może być puste</string>
+    <string name="log_in">Zaloguj</string>
+    <string name="i_am_a_new_user">Jestem nowym użytkownikiem.</string>
 </resources>

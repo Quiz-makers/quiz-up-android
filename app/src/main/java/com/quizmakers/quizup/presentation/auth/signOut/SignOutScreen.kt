@@ -1,9 +1,11 @@
 package com.quizmakers.quizup.presentation.auth.signOut
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -15,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -22,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.ui.common.BaseButton
 import com.quizmakers.quizup.ui.common.BaseTextField
@@ -32,7 +36,6 @@ import com.quizmakers.quizup.ui.theme.QuizUpTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
-import kotlin.reflect.KFunction5
 
 @Destination
 @Composable
@@ -117,16 +120,18 @@ fun SignOutScreen(
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            ) {
             HeaderSingOutScreen(navigateBack)
             Spacer(modifier = Modifier.height(30.dp))
             BaseTextField(
                 valueState = name,
                 onResetError = { nameErrorMessage.value = "" },
                 errorMessage = nameErrorMessage.value,
-                labelText = "Wprowadź imię",
-                placeholderText = "imię",
+                labelText = stringResource(R.string.enter_name),
+                placeholderText = stringResource(R.string.name),
                 focusManager = focusManager
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -134,8 +139,8 @@ fun SignOutScreen(
                 valueState = surname,
                 onResetError = { surnameErrorMessage.value = "" },
                 errorMessage = surnameErrorMessage.value,
-                labelText = "Wprowadź nazwisko",
-                placeholderText = "nazwisko",
+                labelText = stringResource(R.string.enter_last_name),
+                placeholderText = stringResource(R.string.surname),
                 focusManager = focusManager
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -143,8 +148,8 @@ fun SignOutScreen(
                 valueState = userName,
                 onResetError = { usernameErrorMessage.value = "" },
                 errorMessage = usernameErrorMessage.value,
-                labelText = "Wprowadź nick",
-                placeholderText = "nick",
+                labelText = stringResource(R.string.enter_user_name),
+                placeholderText = stringResource(R.string.user_name),
                 focusManager = focusManager
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -152,8 +157,8 @@ fun SignOutScreen(
                 valueState = email,
                 onResetError = { emailErrorMessage.value = "" },
                 errorMessage = emailErrorMessage.value,
-                labelText = "Wprowadź email",
-                placeholderText = "email",
+                labelText = stringResource(R.string.enter_email),
+                placeholderText = stringResource(R.string.email),
                 focusManager = focusManager
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -161,8 +166,8 @@ fun SignOutScreen(
                 valueState = password,
                 onResetError = { passwordErrorMessage.value = "" },
                 errorMessage = passwordErrorMessage.value,
-                labelText = "Wprowadź hasło",
-                placeholderText = "hasło",
+                labelText = stringResource(R.string.enter_your_password),
+                placeholderText = stringResource(R.string.password),
                 focusManager = focusManager,
                 isPassword = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -182,7 +187,7 @@ fun SignOutScreen(
 
             )
             Spacer(modifier = Modifier.height(16.dp))
-            BaseButton(label = "Zarejestruj się", onClick = {
+            BaseButton(label = stringResource(id = R.string.register), onClick = {
                 signOut.invoke(
                     name.value.text,
                     surname.value.text,
@@ -208,19 +213,19 @@ private fun validateError(
     when (authState) {
         is SignOutViewModel.AuthState.Error -> {
             nameErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignInFieldInfo.NAME }?.error
+                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.NAME }?.error
                     ?: ""
             surnameErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignInFieldInfo.SURNAME }?.error
+                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.SURNAME }?.error
                     ?: ""
             usernameErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignInFieldInfo.USERNAME }?.error
+                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.USERNAME }?.error
                     ?: ""
             emailErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignInFieldInfo.EMAIL }?.error
+                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.EMAIL }?.error
                     ?: ""
             passwordErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignInFieldInfo.PASSWORD }?.error
+                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.PASSWORD }?.error
                     ?: ""
         }
         else -> Unit
@@ -266,7 +271,16 @@ private fun HeaderSingOutScreen(onClick: () -> Unit) {
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Zarejestruj się", fontSize = 32.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = stringResource(R.string.register),
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            text = stringResource(R.string.signout_screen_subtitle),
+            fontSize = 20.sp,
+        )
     }
 }
 

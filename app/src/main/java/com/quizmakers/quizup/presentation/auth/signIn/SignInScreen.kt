@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color.Companion.Cyan
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -22,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.presentation.auth.destinations.SignOutScreenDestination
 import com.quizmakers.quizup.ui.common.*
@@ -111,8 +113,8 @@ private fun SignInScreen(
             Spacer(modifier = Modifier.height(60.dp))
             BaseTextField(
                 valueState = email,
-                labelText = "Wprowadź email",
-                placeholderText = "email",
+                labelText = stringResource(id = R.string.enter_email),
+                placeholderText = stringResource(id = R.string.email),
                 isError = isError.value,
                 onResetError = {
                     isError.value = false
@@ -124,8 +126,8 @@ private fun SignInScreen(
             Spacer(modifier = Modifier.height(16.dp))
             BaseTextField(
                 valueState = password,
-                labelText = "Wprowadź hasło",
-                placeholderText = "hasło",
+                labelText = stringResource(id = R.string.enter_your_password),
+                placeholderText = stringResource(id = R.string.password),
                 focusManager = focusManager,
                 isError = isError.value,
                 isPassword = true,
@@ -142,7 +144,7 @@ private fun SignInScreen(
             )
             Spacer(modifier = Modifier.weight(0.1f))
             BaseButton(
-                label = "Zaloguj",
+                label = stringResource(R.string.log_in),
                 onClick = {
                     signIn(signIn, email, password, keyboardController)
                 }
@@ -193,10 +195,10 @@ private fun FooterSignInScreen(onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Text(text = "Jestem nowym użytkownikiem.", fontSize = 12.sp)
+        Text(text = stringResource(id = R.string.i_am_a_new_user), fontSize = 12.sp)
         Spacer(modifier = Modifier.width(4.dp))
         Text(
-            text = "Zarejestruj się",
+            text = stringResource(id = R.string.register),
             style = TextStyle(
                 brush = Brush.linearGradient(
                     colors = listOf(MediumBlue, DarkBlue)

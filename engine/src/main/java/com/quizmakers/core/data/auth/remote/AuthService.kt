@@ -9,5 +9,5 @@ interface AuthService {
     suspend fun signIn(@Body userAuthenticate: UserAuthenticateRequest): Unit
 
     @POST("auth/register")
-    suspend fun signUp(@Body userRegisterRequest: UserRegisterRequest): String
+    suspend fun signUp(@Body userRegisterRequest: UserRegisterRequest): Unit
 }

@@ -1,14 +1,12 @@
 package com.quizmakers.quizup.presentation.auth.signIn
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quizmakers.core.api.exception.ErrorMapper
 import com.quizmakers.core.api.exception.ErrorWrapper
 import com.quizmakers.core.domain.auth.useCases.CoreSignInUseCase
+import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
@@ -53,7 +51,7 @@ class SignInViewModel(
         if (email.isEmpty()) {
             errorField.add(
                 ErrorValidation(
-                    "To pole nie może być puste",
+                    errorMapper.getMessage(R.string.empty_field),
                     SignInFieldInfo.EMAIL
                 )
             )
@@ -61,7 +59,7 @@ class SignInViewModel(
         if (password.isEmpty()) {
             errorField.add(
                 ErrorValidation(
-                    "To pole nie może być puste",
+                    errorMapper.getMessage(R.string.empty_field),
                     SignInFieldInfo.PASSWORD
                 )
             )
