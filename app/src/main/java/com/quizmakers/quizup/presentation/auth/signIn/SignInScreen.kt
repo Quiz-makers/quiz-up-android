@@ -25,7 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
-import com.quizmakers.quizup.presentation.auth.destinations.SignOutScreenDestination
+import com.quizmakers.quizup.presentation.destinations.DashboardScreenDestination
+import com.quizmakers.quizup.presentation.destinations.SignOutScreenDestination
 import com.quizmakers.quizup.ui.common.*
 import com.quizmakers.quizup.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
@@ -54,7 +55,7 @@ fun SignInScreen(
                 }
                 BaseViewModel.AuthEvent.Success -> {
                     isError.value = false
-                    //navToDashboard
+                    navigator.navigateToDashboardScreen()
                 }
             }
         }
@@ -93,7 +94,7 @@ private fun SignInScreen(
     val emailErrorMessage = remember { mutableStateOf("") }
     val passwordErrorMessage = remember { mutableStateOf("") }
 
-    validateError(
+    ValidateError(
         authState,
         emailErrorMessage,
         passwordErrorMessage
@@ -157,7 +158,7 @@ private fun SignInScreen(
 }
 
 @Composable
-private fun validateError(
+private fun ValidateError(
     authState: SignInViewModel.AuthState,
     emailErrorMessage: MutableState<String>,
     passwordErrorMessage: MutableState<String>
@@ -263,6 +264,10 @@ private fun HeaderSignInScreen() {
 
 private fun DestinationsNavigator.navigateToSignOutScreen() {
     navigate(SignOutScreenDestination())
+}
+
+private fun DestinationsNavigator.navigateToDashboardScreen() {
+    navigate(DashboardScreenDestination())
 }
 
 @Preview(

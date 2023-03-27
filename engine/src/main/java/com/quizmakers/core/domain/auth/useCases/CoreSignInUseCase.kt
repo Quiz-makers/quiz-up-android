@@ -1,11 +1,11 @@
 package com.quizmakers.core.domain.auth.useCases
 
-import com.quizmakers.core.data.auth.remote.AuthService
-import com.quizmakers.core.data.auth.remote.UserAuthenticateRequest
+import com.quizmakers.core.domain.auth.repository.SignInRepository
 import org.koin.core.annotation.Factory
 
 @Factory
-open class CoreSignInUseCase(private val api: AuthService) {
+open class CoreSignInUseCase(private val signInRepository: SignInRepository) {
     suspend operator fun invoke(email: String, password: String) =
-        api.signIn(UserAuthenticateRequest(email = email, password = password))
+        signInRepository.signIn(email, password)
+
 }

@@ -2,7 +2,6 @@ package com.quizmakers.quizup.presentation.auth.signIn
 
 import androidx.lifecycle.viewModelScope
 import com.quizmakers.core.api.exception.ErrorMapper
-import com.quizmakers.core.api.exception.ErrorWrapper
 import com.quizmakers.core.domain.auth.useCases.CoreSignInUseCase
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
@@ -13,8 +12,7 @@ import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
 class SignInViewModel(
-    private val getSignInUseCase: CoreSignInUseCase,
-    private val errorWrapper: ErrorWrapper,
+    private val coreSignInUseCase: CoreSignInUseCase,
     private val errorMapper: ErrorMapper,
 ) : BaseViewModel() {
     private val _authState = MutableStateFlow<AuthState>(AuthState.None)
@@ -25,24 +23,29 @@ class SignInViewModel(
             viewModelScope.launch {
                 _authState.emit(AuthState.Loading)
                 runCatching {
-                    getSignInUseCase.invoke(email, password)
+                    coreSignInUseCase.invoke(email, password)
                 }.onFailure {
-                    val error = errorMapper.map(errorWrapper.wrap(it))
-                    sendMessageEvent(AuthEvent.Error(error))
-                    _authState.emit(
-                        AuthState.Error(
-                            arrayListOf(
-                                ErrorValidation(
-                                    error,
-                                    SignInFieldInfo.ONLY_MESSAGE
-                                )
-                            )
-                        )
-                    )
+                    sendErrorEvents(it)
                 }.onSuccess {
                     sendMessageEvent(AuthEvent.Success)
                 }
             }
+        }
+    }
+
+    private suspend fun sendErrorEvents(it: Throwable) {
+        errorMapper.map(it).also { errorMessage ->
+            sendMessageEvent(AuthEvent.Error(errorMessage))
+            _authState.emit(
+                AuthState.Error(
+                    arrayListOf(
+                        ErrorValidation(
+                            errorMessage,
+                            SignInFieldInfo.ONLY_MESSAGE
+                        )
+                    )
+                )
+            )
         }
     }
 

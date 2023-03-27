@@ -3,7 +3,7 @@ package com.quizmakers.quizup.presentation.auth.signOut
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.quizmakers.core.api.exception.ErrorMapper
-import com.quizmakers.core.api.exception.ErrorWrapper
+import com.quizmakers.core.api.exception.ServerException
 import com.quizmakers.core.data.auth.remote.ErrorCatcher
 import com.quizmakers.core.data.auth.remote.Errors
 import com.quizmakers.core.domain.auth.useCases.CoreSignUpUseCase
@@ -16,8 +16,7 @@ import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
 class SignOutViewModel(
-    private val getSignUpUseCase: CoreSignUpUseCase,
-    private val errorWrapper: ErrorWrapper,
+    private val coreSignUpUseCase: CoreSignUpUseCase,
     private val errorMapper: ErrorMapper,
 ) : BaseViewModel() {
     private val _authState = MutableStateFlow<AuthState>(AuthState.None)
@@ -26,18 +25,19 @@ class SignOutViewModel(
     fun signOut(name: String, surname: String, userName: String, email: String, password: String) {
         if (validate(name, surname, userName, email, password)) {
             viewModelScope.launch {
-                errorWrapper.errorBody = null
+
                 _authState.emit(AuthState.Loading)
                 runCatching {
-                    getSignUpUseCase.invoke(name, surname, userName, email, password)
+                    coreSignUpUseCase.invoke(name, surname, userName, email, password)
                 }.onFailure {
-                    val error = errorMapper.map(errorWrapper.wrap(it))
-                    sendMessageEvent(AuthEvent.Error(error))
-                    _authState.emit(
-                        AuthState.Error(
-                            parseErrorBodyToValidateForm(error)
+                    errorMapper.map(it).also { errorMessage ->
+                        sendMessageEvent(AuthEvent.Error(errorMessage))
+                        _authState.emit(
+                            AuthState.Error(
+                                parseErrorBodyToValidateForm(it, errorMessage)
+                            )
                         )
-                    )
+                    }
                 }.onSuccess {
                     sendMessageEvent(AuthEvent.Success)
                 }
@@ -45,8 +45,11 @@ class SignOutViewModel(
         }
     }
 
-    private fun parseErrorBodyToValidateForm(error: String) =
-        errorWrapper.errorBody?.let { errorBody ->
+    private fun parseErrorBodyToValidateForm(
+        throwable: Throwable,
+        error: String
+    ): ArrayList<ErrorValidation> =
+        errorMapper.getErrorBody(throwable as ServerException)?.let { errorBody ->
             Gson().fromJson(
                 errorBody,
                 ErrorCatcher::class.java
