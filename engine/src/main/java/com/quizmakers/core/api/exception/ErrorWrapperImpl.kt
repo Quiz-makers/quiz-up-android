@@ -4,7 +4,7 @@ import org.koin.core.annotation.Factory
 import retrofit2.HttpException
 
 @Factory
-class ErrorWrapperImpl(override var errorBody: String?) : ErrorWrapper {
+class ErrorWrapperImpl() : ErrorWrapper {
 
     override fun wrap(throwable: Throwable): Throwable {
         return when (throwable) {
@@ -18,16 +18,19 @@ class ErrorWrapperImpl(override var errorBody: String?) : ErrorWrapper {
             when (code()) {
                 500 -> ServerException.Internal(message())
                 400 -> {
-                    errorBody = getErrorBody(httpException)
-                    ServerException.BadRequest(message())
+                    ServerException.BadRequest(message(), httpException)
                 }
                 403 -> ServerException.AccessDenied(message())
                 else -> ServerException.Unknown(message())
             }
         }
     }
+}
 
-    private fun getErrorBody(httpException: HttpException): String? {
-        return httpException.response()?.errorBody()?.string()
-    }
+suspend fun <T> callOrThrow(
+    errorWrapper: ErrorWrapper,
+    apiCall: suspend () -> T
+): T {
+    return runCatching { apiCall() }
+        .getOrElse { throw errorWrapper.wrap(it) }
 }

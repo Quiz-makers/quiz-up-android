@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
+import com.quizmakers.quizup.presentation.destinations.DashboardScreenDestination
 import com.quizmakers.quizup.ui.common.BaseButton
 import com.quizmakers.quizup.ui.common.BaseTextField
 import com.quizmakers.quizup.ui.common.LoadingScreen
@@ -57,7 +58,7 @@ fun SignOutScreen(
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
                 BaseViewModel.AuthEvent.Success -> {
-                    //navToDashboard
+                    navigator.navigateToDashboardScreen()
                 }
             }
         }
@@ -103,7 +104,7 @@ fun SignOutScreen(
     val emailErrorMessage = remember { mutableStateOf("") }
     val passwordErrorMessage = remember { mutableStateOf("") }
 
-    validateError(
+    ValidateError(
         authState,
         nameErrorMessage,
         surnameErrorMessage,
@@ -123,7 +124,7 @@ fun SignOutScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
-            ) {
+        ) {
             HeaderSingOutScreen(navigateBack)
             Spacer(modifier = Modifier.height(30.dp))
             BaseTextField(
@@ -201,8 +202,12 @@ fun SignOutScreen(
     }
 }
 
+private fun DestinationsNavigator.navigateToDashboardScreen() {
+    navigate(DashboardScreenDestination())
+}
+
 @Composable
-private fun validateError(
+private fun ValidateError(
     authState: SignOutViewModel.AuthState,
     nameErrorMessage: MutableState<String>,
     surnameErrorMessage: MutableState<String>,

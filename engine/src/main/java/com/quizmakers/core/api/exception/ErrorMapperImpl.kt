@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import com.quizmakers.core.R
 import org.koin.core.annotation.Factory
+import retrofit2.HttpException
 
 @Factory
 class ErrorMapperImpl(private val context: Context) : ErrorMapper {
@@ -21,6 +22,14 @@ class ErrorMapperImpl(private val context: Context) : ErrorMapper {
             is ServerException.BadRequest -> getMessage(R.string.error_bad_request)
             is ServerException.AccessDenied -> getMessage(R.string.access_denied)
             else -> getMessage(R.string.error_unknown)
+        }
+    }
+
+    override fun getErrorBody(serverException: ServerException): String? {
+        return when (serverException) {
+            is ServerException.BadRequest -> (serverException.cause as HttpException).response()
+                ?.errorBody()?.string()
+            else -> null
         }
     }
 

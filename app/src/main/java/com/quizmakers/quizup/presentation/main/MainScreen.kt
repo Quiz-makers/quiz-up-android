@@ -29,6 +29,7 @@ import com.quizmakers.quizup.ui.common.SnackbarHandler
 )
 @Composable
 fun MainScreen(
+    token: String? = null
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
         val sheetState = rememberModalBottomSheetState(
@@ -54,7 +55,8 @@ fun MainScreen(
                         dependency(sheetState)
                         dependency(snackbarState)
                     },
-                    startRoute = NavGraphs.auth, //TODO IF LOGGED ADD
+                    startRoute = token?.let { NavGraphs.quizzes }
+                        ?: NavGraphs.auth,
                     navGraph = RootNavGraph
                 )
             }
