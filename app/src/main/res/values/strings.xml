@@ -15,4 +15,7 @@
     <string name="empty_field">To pole nie może być puste</string>
     <string name="log_in">Zaloguj</string>
     <string name="i_am_a_new_user">Jestem nowym użytkownikiem.</string>
+    <string name="welcome">Witaj w\n</string>
+    <string name="quiz">Quiz</string>
+    <string name="up">UP</string>
 </resources>

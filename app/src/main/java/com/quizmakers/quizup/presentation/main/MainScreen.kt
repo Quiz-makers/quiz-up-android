@@ -49,16 +49,20 @@ fun MainScreen(
                 bottomSheetNavigator = bottomSheetNavigator,
                 sheetElevation = 0.dp
             ) {
-                AppNavigation(
+                BottomNavigationBar(
                     navController = navController,
-                    onOpenSettings = {
-                        dependency(sheetState)
-                        dependency(snackbarState)
-                    },
-                    startRoute = token?.let { NavGraphs.quizzes }
-                        ?: NavGraphs.auth,
-                    navGraph = RootNavGraph
-                )
+                ) {
+                    AppNavigation(
+                        navController = navController,
+                        onOpenSettings = {
+                            dependency(sheetState)
+                            dependency(snackbarState)
+                        },
+                        startRoute = token?.let { NavGraphs.quizzes }
+                            ?: NavGraphs.auth,
+                        navGraph = RootNavGraph
+                    )
+                }
             }
             QuizUpSnackbar(
                 modifier = Modifier

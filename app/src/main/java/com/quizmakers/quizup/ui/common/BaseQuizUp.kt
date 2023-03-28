@@ -18,6 +18,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -50,7 +51,9 @@ fun BaseTextField(
         OutlinedTextField(
             value = valueState.value,
             onValueChange = { newText ->
-                errorMessage?.let { onResetError() }
+                if (errorMessage.isNotBlank()) {
+                    onResetError()
+                }
                 valueState.value = newText
             },
             isError = errorMessage.isNotBlank() || isError,
@@ -66,6 +69,41 @@ fun BaseTextField(
         if (errorMessage.isNotBlank())
             Text(text = errorMessage, color = RedError, fontSize = 12.sp)
     }
+}
+
+@Composable
+fun BaseTextFieldWithIcon(
+    valueState: MutableState<TextFieldValue>,
+    trailingIcon: ImageVector,
+    placeholderText: String,
+    labelText: String,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+    keyboardActions: KeyboardActions = KeyboardActions(
+        onDone = {}
+    ),
+) {
+        OutlinedTextField(
+            value = valueState.value,
+            onValueChange = { newText ->
+                valueState.value = newText
+            },
+            placeholder = { Text(text = placeholderText ) },
+            label = { Text(text = labelText ) },
+            trailingIcon = {
+                Icon(
+                    imageVector = trailingIcon,
+                    contentDescription = trailingIcon.name,
+                    tint = Color.Black,
+                    modifier = Modifier.size(30.dp)
+                )
+            },
+            shape = RoundedCornerShape(10.dp),
+            singleLine = true,
+            maxLines = 1,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+
+        )
 }
 
 @Composable

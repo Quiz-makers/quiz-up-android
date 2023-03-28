@@ -229,7 +229,7 @@ private fun HeaderSignInScreen() {
                         fontWeight = FontWeight.Bold
                     )
                 ) {
-                    append("Witaj w \n")
+                    append(stringResource(R.string.welcome))
                 }
                 withStyle(
                     style = SpanStyle(
@@ -237,7 +237,7 @@ private fun HeaderSignInScreen() {
                         fontWeight = FontWeight.Bold
                     )
                 ) {
-                    append("Quiz")
+                    append(stringResource(R.string.quiz))
                 }
                 withStyle(
                     style = SpanStyle(
@@ -248,7 +248,7 @@ private fun HeaderSignInScreen() {
                         )
                     )
                 ) {
-                    append("UP")
+                    append(stringResource(R.string.up))
                 }
 
             }
