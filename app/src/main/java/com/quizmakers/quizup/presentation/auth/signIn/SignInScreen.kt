@@ -64,7 +64,7 @@ fun SignInScreen(
         SignInViewModel.AuthState.Loading -> LoadingScreen()
         else -> {
             SignInScreen(
-                navigateToSignUpScreen = navigator::navigateToSignOutScreen,
+                navigateToSignUpScreen = navigator::navigateToDashboardScreen,
                 signIn = signInViewModel::signIn,
                 authState = authState,
                 email = email,
@@ -267,7 +267,9 @@ private fun DestinationsNavigator.navigateToSignOutScreen() {
 }
 
 private fun DestinationsNavigator.navigateToDashboardScreen() {
-    navigate(DashboardScreenDestination())
+    navigate(DashboardScreenDestination()){
+        popBackStack()
+    }
 }
 
 @Preview(

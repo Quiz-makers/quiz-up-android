@@ -12,7 +12,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
@@ -20,6 +22,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -82,26 +85,26 @@ fun BaseTextFieldWithIcon(
         onDone = {}
     ),
 ) {
-        OutlinedTextField(
-            value = valueState.value,
-            onValueChange = { newText ->
-                valueState.value = newText
-            },
-            placeholder = { Text(text = placeholderText ) },
-            label = { Text(text = labelText ) },
-            trailingIcon = {
-                Icon(
-                    imageVector = trailingIcon,
-                    contentDescription = trailingIcon.name,
-                    tint = Color.Black,
-                    modifier = Modifier.size(30.dp)
-                )
-            },
-            shape = RoundedCornerShape(10.dp),
-            singleLine = true,
-            maxLines = 1,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
+    OutlinedTextField(
+        value = valueState.value,
+        onValueChange = { newText ->
+            valueState.value = newText
+        },
+        placeholder = { Text(text = placeholderText) },
+        label = { Text(text = labelText) },
+        trailingIcon = {
+            Icon(
+                imageVector = trailingIcon,
+                contentDescription = trailingIcon.name,
+                tint = Color.Black,
+                modifier = Modifier.size(30.dp)
+            )
+        },
+        shape = RoundedCornerShape(10.dp),
+        singleLine = true,
+        maxLines = 1,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
 
         )
 }
@@ -123,6 +126,40 @@ fun BaseButton(label: String, onClick: () -> Unit) {
         elevation = ButtonDefaults.elevation(0.dp, 0.dp)
     ) {
         Text(text = label, fontSize = 20.sp, color = Color.White)
+    }
+}
+
+@Composable
+fun BaseButtonWithIcon(modifier: Modifier, label: String, icon: ImageVector, onClick: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp))
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(10.dp)
+            )
+            .then(modifier),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Transparent
+        ),
+        onClick = onClick,
+        elevation = ButtonDefaults.elevation(0.dp, 0.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = label, color = Color.Black, fontWeight = FontWeight.Medium)
+            Icon(
+                imageVector = icon,
+                contentDescription = icon.name,
+                tint = DarkBlue,
+                modifier = Modifier.size(30.dp)
+            )
+        }
+
     }
 }
 

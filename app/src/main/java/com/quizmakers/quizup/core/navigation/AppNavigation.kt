@@ -11,6 +11,7 @@ import androidx.navigation.NavGraph
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.quizmakers.quizup.presentation.destinations.DashboardScreenDestination
+import com.quizmakers.quizup.presentation.destinations.QuizDetailsBottomSheetDestination
 import com.quizmakers.quizup.presentation.destinations.SignInScreenDestination
 import com.quizmakers.quizup.presentation.destinations.SignOutScreenDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -73,7 +74,8 @@ object NavGraphs {
         override val startRoute = DashboardScreenDestination
 
         override val destinationsByRoute = listOf(
-            DashboardScreenDestination
+            DashboardScreenDestination,
+            QuizDetailsBottomSheetDestination
         ).associateBy { it.route }
     }
 }
