@@ -64,7 +64,7 @@ fun SignInScreen(
         SignInViewModel.AuthState.Loading -> LoadingScreen()
         else -> {
             SignInScreen(
-                navigateToSignUpScreen = navigator::navigateToSignOutScreen,
+                navigateToSignUpScreen = navigator::navigateToDashboardScreen,
                 signIn = signInViewModel::signIn,
                 authState = authState,
                 email = email,
@@ -229,7 +229,7 @@ private fun HeaderSignInScreen() {
                         fontWeight = FontWeight.Bold
                     )
                 ) {
-                    append("Witaj w \n")
+                    append(stringResource(R.string.welcome))
                 }
                 withStyle(
                     style = SpanStyle(
@@ -237,7 +237,7 @@ private fun HeaderSignInScreen() {
                         fontWeight = FontWeight.Bold
                     )
                 ) {
-                    append("Quiz")
+                    append(stringResource(R.string.quiz))
                 }
                 withStyle(
                     style = SpanStyle(
@@ -248,7 +248,7 @@ private fun HeaderSignInScreen() {
                         )
                     )
                 ) {
-                    append("UP")
+                    append(stringResource(R.string.up))
                 }
 
             }
@@ -267,7 +267,9 @@ private fun DestinationsNavigator.navigateToSignOutScreen() {
 }
 
 private fun DestinationsNavigator.navigateToDashboardScreen() {
-    navigate(DashboardScreenDestination())
+    navigate(DashboardScreenDestination()){
+        popBackStack()
+    }
 }
 
 @Preview(

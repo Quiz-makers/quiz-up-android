@@ -15,4 +15,17 @@
     <string name="empty_field">To pole nie może być puste</string>
     <string name="log_in">Zaloguj</string>
     <string name="i_am_a_new_user">Jestem nowym użytkownikiem.</string>
+    <string name="welcome">Witaj w\n</string>
+    <string name="quiz">Quiz</string>
+    <string name="up">UP</string>
+    <string name="hi">"Hej, "</string>
+    <string name="latest_quizzes">Najnowsze Quizzy</string>
+    <string name="my_quiz">Moje Quizz</string>
+    <string name="add_new_quiz">Dodaj nowy Quizz</string>
+    <string name="code_card_info">Jeśli posiadasz kod dostępu, możesz wpisać go w tym miejscu:</string>
+    <string name="code">kod</string>
+    <string name="enter_code_info">Podaj kod i dołącz do quizu</string>
+    <string name="error_default_message">Wygląda na to, że wystąpił problem z pobraniem danych 🥺</string>
+    <string name="start">Rozpocznij</string>
+    <string name="edit">Edytuj</string>
 </resources>

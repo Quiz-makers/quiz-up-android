@@ -203,7 +203,9 @@ fun SignOutScreen(
 }
 
 private fun DestinationsNavigator.navigateToDashboardScreen() {
-    navigate(DashboardScreenDestination())
+    navigate(DashboardScreenDestination()) {
+        popBackStack()
+    }
 }
 
 @Composable
