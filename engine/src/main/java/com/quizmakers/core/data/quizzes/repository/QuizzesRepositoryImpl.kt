@@ -3,7 +3,7 @@ package com.quizmakers.core.data.quizzes.repository
 import com.quizmakers.core.api.exception.ErrorWrapper
 import com.quizmakers.core.api.exception.callOrThrow
 import com.quizmakers.core.data.quizzes.remote.QuizzesService
-import com.quizmakers.core.domain.quizzes.repository.QuizzesRepository
+import com.quizmakers.core.domain.dashboard.repository.QuizzesRepository
 import org.koin.core.annotation.Factory
 
 @Factory

@@ -10,15 +10,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.quizmakers.quizup.R
+import com.quizmakers.quizup.presentation.destinations.QuizScreenDestination
 import com.quizmakers.quizup.ui.common.BaseButtonWithIcon
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.spec.DestinationStyle
 
 @Destination(
     style = DestinationStyle.BottomSheet::class
 )
 @Composable
-fun QuizDetailsBottomSheet() {
+fun QuizDetailsBottomSheet(navigator: DestinationsNavigator) {
+    QuizDetailsBottomSheet(startQuiz = navigator::navigateToQuizScreen)
+}
+
+@Composable
+private fun QuizDetailsBottomSheet(startQuiz: () -> Unit) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -39,8 +46,13 @@ fun QuizDetailsBottomSheet() {
                 modifier = Modifier.weight(0.5f),
                 label = stringResource(R.string.start),
                 icon = Icons.Default.PlayArrow,
-                onClick = {})
+                onClick = startQuiz
+            )
         }
 
     }
+}
+
+private fun DestinationsNavigator.navigateToQuizScreen() {
+    navigate(QuizScreenDestination())
 }

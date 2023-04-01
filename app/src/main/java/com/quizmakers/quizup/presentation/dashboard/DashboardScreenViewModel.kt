@@ -3,7 +3,7 @@ package com.quizmakers.quizup.presentation.dashboard
 import androidx.lifecycle.viewModelScope
 import com.quizmakers.core.api.exception.ErrorMapper
 import com.quizmakers.core.domain.dashboard.useCases.CoreLogOutUseCase
-import com.quizmakers.core.domain.quizzes.useCases.CoreGetQuizzesUseCase
+import com.quizmakers.core.domain.dashboard.useCases.CoreGetQuizzesUseCase
 import com.quizmakers.quizup.core.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
