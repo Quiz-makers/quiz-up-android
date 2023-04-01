@@ -21,8 +21,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.quizmakers.core.data.quizzes.remote.Question
+import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.ui.common.BaseIndicator
+import com.quizmakers.quizup.ui.common.ErrorScreen
+import com.quizmakers.quizup.ui.common.LoadingScreen
 import com.quizmakers.quizup.ui.common.SnackbarHandler
 import com.quizmakers.quizup.ui.theme.DarkBlue
 import com.quizmakers.quizup.ui.theme.GreenSuccess
@@ -32,34 +37,41 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
-val questionsMocks = listOf(
-    Question(
-        "What is the capital city of France?",
-        listOf("Paris", "Madrid", "Rome", "Berlin"),
-        "Paris"
-    ),
-    Question(
-        "What is the highest mountain in the world?",
-        listOf("Mount Everest", "K2", "Kangchenjunga", "Lhotse"),
-        "Mount Everest"
-    ),
-    Question(
-        "What is the largest country in the world by land area?",
-        listOf("Russia", "Canada", "China", "United States"),
-        "Russia"
-    )
-)
 
 @Destination
 @Composable
-fun QuizScreen(navigator: DestinationsNavigator, snackbarHandler: SnackbarHandler) {
-    QuizScreen(closeQuiz = navigator::navigateUp)
+fun QuizScreen(
+    navigator: DestinationsNavigator,
+    snackbarHandler: SnackbarHandler,
+    quizId: String,
+    quizScreenViewModel: QuizScreenViewModel = koinViewModel { parametersOf(quizId) }
+) {
+    LaunchedEffect(Unit) {
+        quizScreenViewModel.authEvent.collect {
+            when (it) {
+                is BaseViewModel.AuthEvent.Error -> {
+                    snackbarHandler.showErrorSnackbar(message = it.error)
+                }
+                BaseViewModel.AuthEvent.Success -> Unit
+            }
+        }
+    }
+    QuizScreen(
+        closeQuiz = navigator::navigateUp,
+        quizState = quizScreenViewModel.quizState.collectAsStateWithLifecycle().value,
+        refresh = quizScreenViewModel::getQuiz
+    )
 }
 
-
 @Composable
-private fun QuizScreen(closeQuiz: () -> Unit) {
+private fun QuizScreen(
+    closeQuiz: () -> Unit,
+    quizState: QuizScreenViewModel.QuizState,
+    refresh: () -> Unit
+) {
     val currentQuestionIndex = remember { mutableStateOf(0) }
     val selectedAnswer = remember { mutableStateOf("") }
     val isAnswered = remember { mutableStateOf(false) }
@@ -88,23 +100,33 @@ private fun QuizScreen(closeQuiz: () -> Unit) {
                 )
             }
         }
-        when (quizJustEnd.value) {
-            true -> QuizSummary(
-                score = score,
-                answersSize = questionsMocks.size,
-                navToDashboardScreen = closeQuiz
-            )
-            false ->
-                QuizLayout(
-                    quizJustEnd = quizJustEnd,
-                    currentQuestionIndex = currentQuestionIndex,
-                    questions = questionsMocks,
-                    selectedAnswer = selectedAnswer,
-                    isAnswered = isAnswered,
-                    buttonLoadingState = buttonLoadingState,
-                    score = score,
-                )
+        when (quizState) {
+            is QuizScreenViewModel.QuizState.Error -> ErrorScreen {
+                refresh()
+            }
+            QuizScreenViewModel.QuizState.Loading -> LoadingScreen()
+            QuizScreenViewModel.QuizState.None -> Unit
+            is QuizScreenViewModel.QuizState.Success -> {
+                when (quizJustEnd.value) {
+                    true -> QuizSummary(
+                        score = score,
+                        answersSize = quizState.quizzesList.size,
+                        navToDashboardScreen = closeQuiz
+                    )
+                    false ->
+                        QuizLayout(
+                            quizJustEnd = quizJustEnd,
+                            currentQuestionIndex = currentQuestionIndex,
+                            questions = quizState.quizzesList,
+                            selectedAnswer = selectedAnswer,
+                            isAnswered = isAnswered,
+                            buttonLoadingState = buttonLoadingState,
+                            score = score,
+                        )
+                }
+            }
         }
+
     }
 }
 
@@ -314,10 +336,3 @@ fun AnswerOption(
         )
     }
 }
-
-data class Question(
-    val question: String,
-    val options: List<String>,
-    val correctAnswer: String,
-    val imageUrl: String? = "https://fajnepodroze.pl/wp-content/uploads/2020/03/Krajobraz.jpg"
-)

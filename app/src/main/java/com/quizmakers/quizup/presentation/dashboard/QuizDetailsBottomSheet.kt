@@ -20,8 +20,8 @@ import com.ramcosta.composedestinations.spec.DestinationStyle
     style = DestinationStyle.BottomSheet::class
 )
 @Composable
-fun QuizDetailsBottomSheet(navigator: DestinationsNavigator) {
-    QuizDetailsBottomSheet(startQuiz = navigator::navigateToQuizScreen)
+fun QuizDetailsBottomSheet(navigator: DestinationsNavigator, quizId: String) {
+    QuizDetailsBottomSheet(startQuiz = { navigator.navigateToQuizScreen(quizId) })
 }
 
 @Composable
@@ -53,6 +53,6 @@ private fun QuizDetailsBottomSheet(startQuiz: () -> Unit) {
     }
 }
 
-private fun DestinationsNavigator.navigateToQuizScreen() {
-    navigate(QuizScreenDestination())
+private fun DestinationsNavigator.navigateToQuizScreen(quizId: String) {
+    navigate(QuizScreenDestination(quizId))
 }

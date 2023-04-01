@@ -69,7 +69,7 @@ fun DashboardScreen(
             dashboardScreenViewModel.logOutFromApp()
             navigator.navigateToSignInScreen()
         },
-        navigateToQuizDetailsBottomSheet = navigator::navigateToQuizDetailsBottomSheet,
+        navigateToQuizDetailsBottomSheet = { navigator.navigateToQuizDetailsBottomSheet(it) },
         onRefresh = dashboardScreenViewModel::getQuizzes,
         dashboardState = dashboardScreenViewModel.dashboardState.collectAsStateWithLifecycle().value
     )
@@ -78,7 +78,7 @@ fun DashboardScreen(
 @Composable
 private fun DashboardScreen(
     navigateToSignInScreen: () -> Unit,
-    navigateToQuizDetailsBottomSheet: () -> Unit,
+    navigateToQuizDetailsBottomSheet: (String) -> Unit,
     onRefresh: () -> Unit,
     dashboardState: DashboardState
 ) {
@@ -110,7 +110,7 @@ private fun DashboardScreen(
 private fun DashboardData(
     cardData: List<String>,
     boxSize: MutableState<Int>,
-    navigateToQuizDetailsBottomSheet: () -> Unit,
+    navigateToQuizDetailsBottomSheet: (String) -> Unit,
 ) {
 
     val search = remember { mutableStateOf(TextFieldValue("")) }
@@ -199,7 +199,7 @@ private fun MainAppBar(navigateToSignInScreen: () -> Unit) {
 @Composable
 fun QuizzesList(
     cardData: List<String>, boxSize: Int,
-    onClick: () -> Unit,
+    onClick: (String) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier.height(boxSize.dp),
@@ -210,7 +210,7 @@ fun QuizzesList(
     ) {
         cardData.forEach { card ->
             item(span = { GridItemSpan(1) }) {
-                QuizCardItem(title = card, onClick = onClick)
+                QuizCardItem(title = card, onClick = { onClick(card) })
             }
         }
     }
@@ -279,8 +279,8 @@ private fun DestinationsNavigator.navigateToSignInScreen() {
     }
 }
 
-private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet() {
-    navigate(QuizDetailsBottomSheetDestination())
+private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet(quizId: String) {
+    navigate(QuizDetailsBottomSheetDestination(quizId))
 }
 
 
