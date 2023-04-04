@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.quizmakers.core.data.quizzes.remote.Question
+import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.ui.common.BaseIndicator
 import com.quizmakers.quizup.ui.common.ErrorScreen
@@ -150,7 +152,7 @@ fun QuizSummary(
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Twój wynik to :", fontSize = 30.sp)
+                Text(text = stringResource(R.string.your_points), fontSize = 30.sp)
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     buildAnnotatedString {
@@ -176,7 +178,7 @@ fun QuizSummary(
             onClick = navToDashboardScreen,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text("Zakończ")
+            Text(stringResource(R.string.finish))
         }
     }
 }
@@ -244,7 +246,7 @@ private fun QuizLayout(
                     Text(
                         textAlign = TextAlign.Start,
                         modifier = Modifier.weight(1f),
-                        text = "Pytanie  ${currentQuestionIndex.value + 1}/${questions.size}",
+                        text = stringResource(R.string.question) + "${currentQuestionIndex.value + 1}/${questions.size}",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -279,6 +281,7 @@ private fun QuizLayout(
             questions[currentQuestionIndex.value].options.forEach { option ->
                 Card(elevation = 2.dp) {
                     AnswerOption(
+                        isClickable = count > 0,
                         option = option,
                         isSelected = option == selectedAnswer.value,
                         onOptionSelected = { selectedAnswer.value = it },
@@ -298,13 +301,14 @@ private fun QuizLayout(
             if (buttonLoadingState.value)
                 BaseIndicator(size = 30.dp)
             else
-                Text(text = "Odpowiedz")
+                Text(text = stringResource(R.string.answer))
         }
     }
 }
 
 @Composable
 fun AnswerOption(
+    isClickable: Boolean,
     option: String,
     isSelected: Boolean,
     onOptionSelected: (String) -> Unit,
@@ -323,7 +327,7 @@ fun AnswerOption(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = if (isAnswered) backgroundCheckColor else backgroundColor)
-            .clickable(onClick = { onOptionSelected(option) })
+            .clickable(onClick = { onOptionSelected(option) }, enabled = isClickable)
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

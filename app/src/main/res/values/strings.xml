@@ -28,4 +28,8 @@
     <string name="error_default_message">Wygląda na to, że wystąpił problem z pobraniem danych 🥺</string>
     <string name="start">Rozpocznij</string>
     <string name="edit">Edytuj</string>
+    <string name="your_points">Twój wynik to :</string>
+    <string name="finish">Zakończ</string>
+    <string name="question">"Pytanie  "</string>
+    <string name="answer">Odpowiedz</string>
 </resources>
