@@ -1,4 +1,4 @@
-package com.quizmakers.quizup.presentation.quizzes
+package com.quizmakers.quizup.presentation.quizzes.playground
 
 import androidx.lifecycle.viewModelScope
 import com.quizmakers.core.api.exception.ErrorMapper
