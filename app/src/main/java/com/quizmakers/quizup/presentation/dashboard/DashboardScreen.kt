@@ -37,6 +37,7 @@ import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.presentation.dashboard.DashboardScreenViewModel.DashboardState
 import com.quizmakers.quizup.presentation.destinations.QuizDetailsBottomSheetDestination
+import com.quizmakers.quizup.presentation.destinations.QuizManagerScreenDestination
 import com.quizmakers.quizup.presentation.destinations.SignInScreenDestination
 import com.quizmakers.quizup.ui.common.*
 import com.quizmakers.quizup.ui.theme.DarkBlue
@@ -70,6 +71,7 @@ fun DashboardScreen(
             navigator.navigateToSignInScreen()
         },
         navigateToQuizDetailsBottomSheet = { navigator.navigateToQuizDetailsBottomSheet(it) },
+        navigateQuizManagerScreen = { navigator.navigateQuizManagerScreen() },
         onRefresh = dashboardScreenViewModel::getQuizzes,
         dashboardState = dashboardScreenViewModel.dashboardState.collectAsStateWithLifecycle().value
     )
@@ -80,7 +82,8 @@ private fun DashboardScreen(
     navigateToSignInScreen: () -> Unit,
     navigateToQuizDetailsBottomSheet: (String) -> Unit,
     onRefresh: () -> Unit,
-    dashboardState: DashboardState
+    dashboardState: DashboardState,
+    navigateQuizManagerScreen: () -> Unit
 ) {
     val boxSize = remember { mutableStateOf(0) }
     Box(
@@ -97,7 +100,12 @@ private fun DashboardScreen(
                 is DashboardState.Success -> {
                     val quizzes = dashboardState.quizzesList
                     boxSize.value = ((quizzes.size / 2) * 100) + (quizzes.size / 2) * 25
-                    DashboardData(quizzes, boxSize, navigateToQuizDetailsBottomSheet)
+                    DashboardData(
+                        navigateQuizManagerScreen = navigateQuizManagerScreen,
+                        cardData = quizzes,
+                        boxSize = boxSize,
+                        navigateToQuizDetailsBottomSheet = navigateToQuizDetailsBottomSheet
+                    )
                 }
             }
 
@@ -111,6 +119,7 @@ private fun DashboardData(
     cardData: List<String>,
     boxSize: MutableState<Int>,
     navigateToQuizDetailsBottomSheet: (String) -> Unit,
+    navigateQuizManagerScreen: () -> Unit,
 ) {
 
     val search = remember { mutableStateOf(TextFieldValue("")) }
@@ -145,9 +154,9 @@ private fun DashboardData(
             BaseButtonWithIcon(
                 label = stringResource(R.string.add_new_quiz),
                 icon = Icons.Default.Add,
-                onClick = {},
-                modifier = Modifier.fillMaxWidth()
-            )
+                onClick = navigateQuizManagerScreen,
+                modifier = Modifier.fillMaxWidth())
+
         }
         item { Spacer(modifier = Modifier.height(20.dp)) }
 
@@ -284,12 +293,16 @@ private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet(quizId: Strin
 }
 
 
+private fun DestinationsNavigator.navigateQuizManagerScreen() {
+    navigate(QuizManagerScreenDestination())
+}
+
 @Preview(
     showBackground = true
 )
 @Composable
 private fun DashboardScreenPreview() {
     QuizUpTheme {
-        DashboardScreen({}, {}, {}, DashboardState.None)
+        DashboardScreen({}, {}, {}, DashboardState.None) { }
     }
 }
