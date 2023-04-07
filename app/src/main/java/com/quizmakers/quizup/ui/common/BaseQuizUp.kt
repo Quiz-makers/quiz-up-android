@@ -216,7 +216,6 @@ fun BaseButton(label: String, onClick: () -> Unit) {
 fun BaseButtonWithIcon(modifier: Modifier, label: String, icon: ImageVector, onClick: () -> Unit) {
     Button(
         modifier = Modifier
-            .fillMaxWidth()
             .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp))
             .background(
                 brush = Brush.linearGradient(
@@ -252,7 +251,7 @@ fun BaseButtonWithIcon(modifier: Modifier, label: String, icon: ImageVector, onC
 fun BaseIndicator(
     size: Dp = 42.dp,
     sweepAngle: Float = 90f,
-    color: Color = MaterialTheme.colors.primary,
+    color: Color = DarkBlue,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
 ) {
     val transition = rememberInfiniteTransition()
@@ -276,7 +275,7 @@ fun BaseIndicator(
             .size(size) // canvas size
             .padding(strokeWidth / 2)
     ) {
-        drawCircle(Color.LightGray, style = stroke)
+        drawCircle(Color.White, style = stroke)
         drawArc(
             color,
             startAngle = currentArcStartAngle.toFloat() - 90,

@@ -7,12 +7,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
@@ -27,14 +29,8 @@ import coil.compose.AsyncImage
 import com.quizmakers.core.data.quizzes.remote.Question
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
-import com.quizmakers.quizup.ui.common.BaseIndicator
-import com.quizmakers.quizup.ui.common.ErrorScreen
-import com.quizmakers.quizup.ui.common.LoadingScreen
-import com.quizmakers.quizup.ui.common.SnackbarHandler
-import com.quizmakers.quizup.ui.theme.DarkBlue
-import com.quizmakers.quizup.ui.theme.GreenSuccess
-import com.quizmakers.quizup.ui.theme.MediumBlue
-import com.quizmakers.quizup.ui.theme.RedError
+import com.quizmakers.quizup.ui.common.*
+import com.quizmakers.quizup.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
@@ -52,12 +48,12 @@ fun QuizScreen(
     quizScreenViewModel: QuizScreenViewModel = koinViewModel { parametersOf(quizId) }
 ) {
     LaunchedEffect(Unit) {
-        quizScreenViewModel.authEvent.collect {
+        quizScreenViewModel.messageEvent.collect {
             when (it) {
-                is BaseViewModel.AuthEvent.Error -> {
+                is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
-                BaseViewModel.AuthEvent.Success -> Unit
+                BaseViewModel.MessageEvent.Success -> Unit
             }
         }
     }
@@ -145,41 +141,38 @@ fun QuizSummary(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Card(elevation = 10.dp) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = stringResource(R.string.your_points), fontSize = 30.sp)
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                fontSize = 50.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                brush = Brush.linearGradient(
-                                    colors = listOf(MediumBlue, DarkBlue)
-                                )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = stringResource(R.string.your_points), fontSize = 30.sp)
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 50.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            brush = Brush.linearGradient(
+                                colors = listOf(MediumBlue, DarkBlue)
                             )
-                        ) {
-                            append("${score.value}/${answersSize}")
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-            }
+                        )
+                    ) {
+                        append("${score.value}/${answersSize}")
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(
+        BaseButtonWithIcon(
+            label = stringResource(R.string.finish),
+            icon = Icons.Default.Done,
             onClick = navToDashboardScreen,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text(stringResource(R.string.finish))
-        }
+            modifier = Modifier.fillMaxWidth(0.5f).align(Alignment.CenterHorizontally))
     }
 }
 
@@ -268,10 +261,14 @@ private fun QuizLayout(
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                questions[currentQuestionIndex.value].imageUrl?.let {
+                questions[currentQuestionIndex.value].imageBitmap?.let {
                     AsyncImage(
                         model = it,
-                        contentDescription = null
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
                     )
                 }
             }

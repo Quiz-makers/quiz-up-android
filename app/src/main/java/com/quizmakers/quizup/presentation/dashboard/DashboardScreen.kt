@@ -56,12 +56,12 @@ fun DashboardScreen(
     snackbarHandler: SnackbarHandler,
 ) {
     LaunchedEffect(Unit) {
-        dashboardScreenViewModel.authEvent.collect {
+        dashboardScreenViewModel.messageEvent.collect {
             when (it) {
-                is BaseViewModel.AuthEvent.Error -> {
+                is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
-                BaseViewModel.AuthEvent.Success -> Unit
+                BaseViewModel.MessageEvent.Success -> Unit
             }
         }
     }

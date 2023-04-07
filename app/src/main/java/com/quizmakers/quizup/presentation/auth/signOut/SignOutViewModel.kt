@@ -31,7 +31,7 @@ class SignOutViewModel(
                     coreSignUpUseCase.invoke(name, surname, userName, email, password)
                 }.onFailure {
                     errorMapper.map(it).also { errorMessage ->
-                        sendMessageEvent(AuthEvent.Error(errorMessage))
+                        sendMessageEvent(MessageEvent.Error(errorMessage))
                         _authState.emit(
                             AuthState.Error(
                                 parseErrorBodyToValidateForm(it, errorMessage)
@@ -39,7 +39,7 @@ class SignOutViewModel(
                         )
                     }
                 }.onSuccess {
-                    sendMessageEvent(AuthEvent.Success)
+                    sendMessageEvent(MessageEvent.Success)
                 }
             }
         }

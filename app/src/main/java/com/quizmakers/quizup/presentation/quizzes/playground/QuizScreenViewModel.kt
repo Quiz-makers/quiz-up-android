@@ -35,7 +35,7 @@ class QuizScreenViewModel(
                 coreGetQuizDetailsUseCase.invoke()
             }.onFailure {
                 errorMapper.map(it).also { errorMessage ->
-                    sendMessageEvent(AuthEvent.Error(errorMessage))
+                    sendMessageEvent(MessageEvent.Error(errorMessage))
                     _quizState.emit(QuizState.Error(errorMessage))
                 }
             }.onSuccess {

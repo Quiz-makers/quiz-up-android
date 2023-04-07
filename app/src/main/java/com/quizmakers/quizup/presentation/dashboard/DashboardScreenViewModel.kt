@@ -32,7 +32,7 @@ class DashboardScreenViewModel(
                 coreGetQuizzesUseCase.invoke()
             }.onFailure {
                 errorMapper.map(it).also { errorMessage ->
-                    sendMessageEvent(AuthEvent.Error(errorMessage))
+                    sendMessageEvent(MessageEvent.Error(errorMessage))
                     _dashboardState.emit(DashboardState.Error(errorMessage))
                 }
             }.onSuccess {

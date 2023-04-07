@@ -47,13 +47,13 @@ fun SignInScreen(
     val isError = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        signInViewModel.authEvent.collect {
+        signInViewModel.messageEvent.collect {
             when (it) {
-                is BaseViewModel.AuthEvent.Error -> {
+                is BaseViewModel.MessageEvent.Error -> {
                     isError.value = true
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
-                BaseViewModel.AuthEvent.Success -> {
+                BaseViewModel.MessageEvent.Success -> {
                     isError.value = false
                     navigator.navigateToDashboardScreen()
                 }
@@ -64,7 +64,7 @@ fun SignInScreen(
         SignInViewModel.AuthState.Loading -> LoadingScreen()
         else -> {
             SignInScreen(
-                navigateToSignUpScreen = navigator::navigateToDashboardScreen,
+                navigateToSignUpScreen = navigator::navigateToSignOutScreen,
                 signIn = signInViewModel::signIn,
                 authState = authState,
                 email = email,

@@ -52,12 +52,12 @@ fun SignOutScreen(
     val password = remember { mutableStateOf(TextFieldValue("")) }
 
     LaunchedEffect(Unit) {
-        signOutViewModel.authEvent.collect {
+        signOutViewModel.messageEvent.collect {
             when (it) {
-                is BaseViewModel.AuthEvent.Error -> {
+                is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
-                BaseViewModel.AuthEvent.Success -> {
+                BaseViewModel.MessageEvent.Success -> {
                     navigator.navigateToDashboardScreen()
                 }
             }
