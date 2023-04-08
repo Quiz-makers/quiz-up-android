@@ -19,7 +19,3 @@ class AuthInterceptor(private val sharedPreferences: SharedPreferences) : Interc
         }.build())
     }
 }
-
-private fun String.containsAny(items: List<String>): Boolean {
-    return items.any { this.contains(it) }
-}

@@ -1,5 +1,8 @@
 package com.quizmakers.core.domain.dashboard.repository
 
+import com.quizmakers.core.data.quizzes.remote.QuizResponseApi
+
 interface QuizzesRepository {
-    suspend fun getQuizzes(): List<String>
+    suspend fun getPublicQuizzes(): List<QuizResponseApi>
+    suspend fun getUserQuizzes(): List<QuizResponseApi>
 }

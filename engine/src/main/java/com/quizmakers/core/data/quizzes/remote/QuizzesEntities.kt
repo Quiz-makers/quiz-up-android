@@ -40,6 +40,27 @@ data class QuizRequestApi(
     val publicAvailable: Boolean
 )
 
+data class QuizResponseApi(
+    val type: String?,
+    val category: String?,
+    val title: String,
+    val createdDate: String?,
+    val quizId: Int?,
+    val score: Int?,
+    val publicAvailable: Boolean?,
+    val metaTitle: String?,
+    val slug: String?,
+    val updatedAt: String?,
+    val publicFrom: String?,
+    val startsAt: String?,
+    val endsAt: String?,
+    val summary: String?,
+    val ownerName: String?,
+    val ownerSurname: String?,
+    val quizTime: Int?,
+    val description: String?
+)
+
 data class QuestionsRequestApi(
     val questions: List<String>,
     val image: List<String?>,

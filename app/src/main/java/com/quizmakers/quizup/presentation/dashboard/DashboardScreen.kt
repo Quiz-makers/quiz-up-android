@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.quizmakers.core.data.quizzes.remote.QuizResponseApi
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.presentation.dashboard.DashboardScreenViewModel.DashboardState
@@ -80,12 +81,13 @@ fun DashboardScreen(
 @Composable
 private fun DashboardScreen(
     navigateToSignInScreen: () -> Unit,
-    navigateToQuizDetailsBottomSheet: (String) -> Unit,
+    navigateToQuizDetailsBottomSheet: (QuizResponseApi) -> Unit,
     onRefresh: () -> Unit,
     dashboardState: DashboardState,
     navigateQuizManagerScreen: () -> Unit
 ) {
-    val boxSize = remember { mutableStateOf(0) }
+    val boxSizePublic = remember { mutableStateOf(0) }
+    val boxSizeUser = remember { mutableStateOf(0) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -98,12 +100,17 @@ private fun DashboardScreen(
                 DashboardState.Loading -> LoadingScreen()
                 DashboardState.None -> Unit
                 is DashboardState.Success -> {
-                    val quizzes = dashboardState.quizzesList
-                    boxSize.value = ((quizzes.size / 2) * 100) + (quizzes.size / 2) * 25
+                    val publicQuizzes = dashboardState.data.first
+                    val userQuizzes = dashboardState.data.second
+                    boxSizePublic.value =
+                        ((publicQuizzes.size / 2) * 100) + (publicQuizzes.size / 2) * 25
+                    boxSizeUser.value = ((userQuizzes.size / 2) * 100) + (userQuizzes.size / 2) * 25
                     DashboardData(
                         navigateQuizManagerScreen = navigateQuizManagerScreen,
-                        cardData = quizzes,
-                        boxSize = boxSize,
+                        publicQuizzes = publicQuizzes,
+                        userQuizzes = userQuizzes,
+                        boxSizePublic = boxSizePublic,
+                        boxSizeUser = boxSizeUser,
                         navigateToQuizDetailsBottomSheet = navigateToQuizDetailsBottomSheet
                     )
                 }
@@ -116,9 +123,11 @@ private fun DashboardScreen(
 
 @Composable
 private fun DashboardData(
-    cardData: List<String>,
-    boxSize: MutableState<Int>,
-    navigateToQuizDetailsBottomSheet: (String) -> Unit,
+    publicQuizzes: List<QuizResponseApi>,
+    userQuizzes: List<QuizResponseApi>,
+    boxSizePublic: MutableState<Int>,
+    boxSizeUser: MutableState<Int>,
+    navigateToQuizDetailsBottomSheet: (QuizResponseApi) -> Unit,
     navigateQuizManagerScreen: () -> Unit,
 ) {
 
@@ -128,42 +137,43 @@ private fun DashboardData(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier.fillMaxSize()
     ) {
-        item { Spacer(modifier = Modifier.height(12.dp)) }
-        item { CodeCard(search) }
-        item { Spacer(modifier = Modifier.height(8.dp)) }
         item {
-            Text(
-                text = stringResource(R.string.latest_quizzes),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+            Spacer(modifier = Modifier.height(12.dp))
+            CodeCard(search)
+            Spacer(modifier = Modifier.height(8.dp))
+            if (publicQuizzes.isNotEmpty())
+                Text(
+                    text = stringResource(R.string.latest_quizzes),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            Spacer(modifier = Modifier.height(8.dp))
+            QuizzesList(
+                cardData = publicQuizzes,
+                boxSize = boxSizePublic.value,
+                onClick = navigateToQuizDetailsBottomSheet
             )
-        }
-        item { Spacer(modifier = Modifier.height(8.dp)) }
-        item { QuizzesList(
-            cardData = cardData,
-            boxSize = boxSize.value,
-            onClick = navigateToQuizDetailsBottomSheet
-        ) }
-        item {
+            if (userQuizzes.isNotEmpty())
             Text(
                 text = stringResource(R.string.my_quiz),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-        }
-        item { Spacer(modifier = Modifier.height(8.dp)) }
-        item { QuizzesList(cardData, boxSize.value, navigateToQuizDetailsBottomSheet) }
-        item { Spacer(modifier = Modifier.height(8.dp)) }
-        item {
+            Spacer(modifier = Modifier.height(8.dp))
+            QuizzesList(
+                cardData = userQuizzes,
+                boxSize = boxSizeUser.value,
+                onClick = navigateToQuizDetailsBottomSheet
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             BaseButtonWithIcon(
                 label = stringResource(R.string.add_new_quiz),
                 icon = Icons.Default.Add,
                 onClick = navigateQuizManagerScreen,
-                modifier = Modifier.fillMaxWidth())
-
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(20.dp))
         }
-        item { Spacer(modifier = Modifier.height(20.dp)) }
-
     }
 }
 
@@ -211,8 +221,8 @@ private fun MainAppBar(navigateToSignInScreen: () -> Unit) {
 
 @Composable
 fun QuizzesList(
-    cardData: List<String>, boxSize: Int,
-    onClick: (String) -> Unit,
+    cardData: List<QuizResponseApi>, boxSize: Int,
+    onClick: (QuizResponseApi) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier.height(boxSize.dp),
@@ -223,7 +233,7 @@ fun QuizzesList(
     ) {
         cardData.forEach { card ->
             item(span = { GridItemSpan(1) }) {
-                QuizCardItem(title = card, onClick = { onClick(card) })
+                QuizCardItem(title = card.title, onClick = { onClick(card) })
             }
         }
     }
@@ -292,8 +302,8 @@ private fun DestinationsNavigator.navigateToSignInScreen() {
     }
 }
 
-private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet(quizId: String) {
-    navigate(QuizDetailsBottomSheetDestination(quizId))
+private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet(quizResponseApi: QuizResponseApi) {
+    navigate(QuizDetailsBottomSheetDestination(quizResponseApi.quizId.toString()))
 }
 
 
