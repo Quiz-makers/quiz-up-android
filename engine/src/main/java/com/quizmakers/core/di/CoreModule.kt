@@ -12,7 +12,6 @@ import com.quizmakers.core.api.nullOnEmptyConverterFactory
 import com.quizmakers.core.base.AUTH_CHANNEL_SP
 import com.quizmakers.core.data.quizzes.remote.QuizzesService
 import com.quizmakers.core.data.auth.remote.AuthService
-import com.quizmakers.core.domain.session.SessionManager
 import okhttp3.OkHttpClient
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
@@ -26,7 +25,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class CoreModule {
     @Single
     fun provideRetrofit(client: OkHttpClient) = Retrofit.Builder()
-        .client(client)
+        .callFactory(client)
         .baseUrl(Server.BASE_URL)
         .addConverterFactory(nullOnEmptyConverterFactory)
         .addConverterFactory(GsonConverterFactory.create())
@@ -50,7 +49,7 @@ class CoreModule {
     fun getSharedPrefs(androidApplication: Application): SharedPreferences {
         return androidApplication.getSharedPreferences(
             AUTH_CHANNEL_SP,
-            android.content.Context.MODE_PRIVATE
+            Context.MODE_PRIVATE
         )
     }
 
@@ -60,8 +59,8 @@ class CoreModule {
     }
 
     @Single
-    fun provideAuthInterceptor(sessionManager: SessionManager) =
-        AuthInterceptor(sessionManager.getToken())
+    fun provideAuthInterceptor(sharedPreferences: SharedPreferences) =
+        AuthInterceptor(sharedPreferences)
 
     @Single
     fun provideOkHttpClient(
@@ -72,6 +71,7 @@ class CoreModule {
         .addInterceptor(authInterceptor)
         .addInterceptor(interceptor)
         .addInterceptor(chuckerInterceptor)
+        .build()
 
     @Single
     fun provideAuthService(retrofit: Retrofit): AuthService =

@@ -8,6 +8,7 @@ import com.quizmakers.core.domain.auth.repository.SignInRepository
 import com.quizmakers.core.domain.session.SessionManager
 import okhttp3.Headers
 import org.koin.core.annotation.Factory
+import retrofit2.HttpException
 import retrofit2.Response
 
 @Factory
@@ -20,7 +21,11 @@ class SignInRepositoryImpl(
         callOrThrow(errorWrapper) {
             api.signIn(UserAuthenticateRequest(email = email.trim(), password = password))
         }.also {
-            saveAuthorizationHeader(it)
+            if (!it.isSuccessful){
+                throw errorWrapper.wrap(HttpException(it))
+            }else{
+                saveAuthorizationHeader(it)
+            }
         }
     }
 

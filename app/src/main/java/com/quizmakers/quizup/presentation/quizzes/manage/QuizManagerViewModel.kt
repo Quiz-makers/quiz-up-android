@@ -35,7 +35,7 @@ class QuizManagerViewModel(
         viewModelScope.launch {
             _quizManagerState.emit(QuizManagerState.Loading)
             runCatching {
-                delay(1200)
+              //  delay(1200)
                 coreGetCategoriesUseCase.invoke()
             }.onFailure {
                 errorMapper.map(it).also { errorMessage ->
@@ -58,7 +58,7 @@ class QuizManagerViewModel(
         viewModelScope.launch {
             _addedState.emit(AddQuizState.Loading)
             runCatching {
-                delay(1200)
+               // delay(1200)
                 coreAddNewQuizUseCase.invoke(
                     QuizRequestApi(
                         ownerId = 3,

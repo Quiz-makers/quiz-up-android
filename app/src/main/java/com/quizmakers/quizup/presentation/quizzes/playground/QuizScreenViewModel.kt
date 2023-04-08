@@ -31,7 +31,7 @@ class QuizScreenViewModel(
         viewModelScope.launch {
             _quizState.emit(QuizState.Loading)
             runCatching {
-                delay(1200)
+              //  delay(1200)
                 coreGetQuizDetailsUseCase.invoke()
             }.onFailure {
                 errorMapper.map(it).also { errorMessage ->
