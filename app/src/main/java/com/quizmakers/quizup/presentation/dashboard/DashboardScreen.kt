@@ -139,7 +139,11 @@ private fun DashboardData(
             )
         }
         item { Spacer(modifier = Modifier.height(8.dp)) }
-        item { QuizzesList(cardData, boxSize.value, navigateToQuizDetailsBottomSheet) }
+        item { QuizzesList(
+            cardData = cardData,
+            boxSize = boxSize.value,
+            onClick = navigateToQuizDetailsBottomSheet
+        ) }
         item {
             Text(
                 text = stringResource(R.string.my_quiz),

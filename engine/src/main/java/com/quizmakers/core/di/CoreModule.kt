@@ -1,7 +1,11 @@
 package com.quizmakers.core.di
 
 import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
+import com.chuckerteam.chucker.api.RetentionManager
 import com.quizmakers.core.api.Server
 import com.quizmakers.core.api.interceptors.AuthInterceptor
 import com.quizmakers.core.api.nullOnEmptyConverterFactory
@@ -29,10 +33,18 @@ class CoreModule {
         .build()
 
     @Single
-    fun provideInterceptor() = HttpLoggingInterceptor()
-        .apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
+    fun provideChuckerInterceptor(context: Context) = ChuckerInterceptor.Builder(context).collector(
+        ChuckerCollector(
+            context = context,
+            showNotification = true,
+            retentionPeriod = RetentionManager.Period.ONE_HOUR
+        )
+    ).maxContentLength(250_000L).redactHeaders(emptySet()).alwaysReadResponseBody(true).build()
+
+    @Single
+    fun provideInterceptor() = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
 
     @Single
     fun getSharedPrefs(androidApplication: Application): SharedPreferences {
@@ -54,11 +66,12 @@ class CoreModule {
     @Single
     fun provideOkHttpClient(
         authInterceptor: AuthInterceptor,
-        interceptor: HttpLoggingInterceptor
+        interceptor: HttpLoggingInterceptor,
+        chuckerInterceptor: ChuckerInterceptor
     ) = OkHttpClient.Builder()
         .addInterceptor(authInterceptor)
         .addInterceptor(interceptor)
-        .build()
+        .addInterceptor(chuckerInterceptor)
 
     @Single
     fun provideAuthService(retrofit: Retrofit): AuthService =

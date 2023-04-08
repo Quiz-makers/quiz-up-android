@@ -18,7 +18,7 @@ class SignInRepositoryImpl(
 ) : SignInRepository {
     override suspend fun signIn(email: String, password: String) {
         callOrThrow(errorWrapper) {
-            api.signIn(UserAuthenticateRequest(email = email, password = password))
+            api.signIn(UserAuthenticateRequest(email = email.trim(), password = password))
         }.also {
             saveAuthorizationHeader(it)
         }
