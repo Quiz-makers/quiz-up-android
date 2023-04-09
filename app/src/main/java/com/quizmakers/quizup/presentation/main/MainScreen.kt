@@ -56,7 +56,7 @@ fun MainScreen(
                         dependency(snackbarState)
                     },
                     startRoute = token?.let { NavGraphs.quizzes }
-                        ?: NavGraphs.quizzes,
+                        ?: NavGraphs.auth,
                     navGraph = RootNavGraph
                 )
             }

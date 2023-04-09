@@ -72,6 +72,7 @@ object NavGraphs {
 
         override val destinationsByRoute = listOf(
             DashboardScreenDestination,
+            QuizManagerScreenDestination,
             QuizDetailsBottomSheetDestination,
             QuizScreenDestination
         ).associateBy { it.route }

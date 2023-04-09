@@ -27,7 +27,7 @@ class SignInViewModel(
                 }.onFailure {
                     sendErrorEvents(it)
                 }.onSuccess {
-                    sendMessageEvent(AuthEvent.Success)
+                    sendMessageEvent(MessageEvent.Success)
                 }
             }
         }
@@ -35,7 +35,7 @@ class SignInViewModel(
 
     private suspend fun sendErrorEvents(it: Throwable) {
         errorMapper.map(it).also { errorMessage ->
-            sendMessageEvent(AuthEvent.Error(errorMessage))
+            sendMessageEvent(MessageEvent.Error(errorMessage))
             _authState.emit(
                 AuthState.Error(
                     arrayListOf(

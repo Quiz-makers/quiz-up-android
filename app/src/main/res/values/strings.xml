@@ -20,7 +20,7 @@
     <string name="up">UP</string>
     <string name="hi">"Hej, "</string>
     <string name="latest_quizzes">Najnowsze Quizzy</string>
-    <string name="my_quiz">Moje Quizz</string>
+    <string name="my_quiz">Moje Quizy</string>
     <string name="add_new_quiz">Dodaj nowy Quizz</string>
     <string name="code_card_info">Jeśli posiadasz kod dostępu, możesz wpisać go w tym miejscu:</string>
     <string name="code">kod</string>
@@ -31,5 +31,14 @@
     <string name="your_points">Twój wynik to :</string>
     <string name="finish">Zakończ</string>
     <string name="question">"Pytanie  "</string>
-    <string name="answer">Odpowiedz</string>
+    <string name="answer">Odpowiedź</string>
+    <string name="quiz_title">Tytul</string>
+    <string name="enter_quiz_desc">Wprowadź tytul</string>
+    <string name="description">Opis</string>
+    <string name="enter_desc">Wprowadź Opis</string>
+    <string name="add">Dodaj</string>
+    <string name="add_new_question">Dodaj kolejne pytanie</string>
+    <string name="add_category">Dodaj kategorię</string>
+    <string name="enter_question">Wprowadż pytanie</string>
+    <string name="enter_answer">Wprowadż odpowiedź</string>
 </resources>

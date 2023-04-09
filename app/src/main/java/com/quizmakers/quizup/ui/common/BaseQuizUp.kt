@@ -1,8 +1,7 @@
 package com.quizmakers.quizup.ui.common
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.quizmakers.quizup.ui.theme.DarkBlue
+import com.quizmakers.quizup.ui.theme.MediumBlue
 import com.quizmakers.quizup.ui.theme.RedError
 
 @Composable
@@ -69,6 +70,90 @@ fun BaseTextField(
         )
         if (errorMessage.isNotBlank())
             Text(text = errorMessage, color = RedError, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun BaseTextFieldRounded(
+    modifier: Modifier = Modifier,
+    valueState: MutableState<TextFieldValue>,
+    placeholderText: String,
+    focusManager: FocusManager,
+    labelText: String,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+    keyboardActions: KeyboardActions = KeyboardActions(
+        onNext = {
+            focusManager.moveFocus(FocusDirection.Down)
+        }
+    ),
+    singleLine: Boolean = true,
+    leadingIcon: ImageVector,
+) {
+    OutlinedTextField(
+        value = valueState.value,
+        onValueChange = { newText ->
+            valueState.value = newText
+        },
+        modifier = modifier,
+        placeholder = { Text(text = placeholderText, fontSize = 14.sp) },
+        label = { Text(text = labelText, fontSize = 14.sp) },
+        shape = RoundedCornerShape(10.dp),
+        singleLine = singleLine,
+        maxLines = if (singleLine) 1 else 2,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        leadingIcon = {
+            Icon(
+                imageVector = leadingIcon,
+                contentDescription = leadingIcon.name,
+                tint = DarkBlue,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    )
+}
+
+@Composable
+fun BaseToggleButton(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val toggleTexts = Pair("Publiczny", "Prywatny")
+
+    Row(
+        modifier = modifier.border(
+            BorderStroke(1.dp, Color.Gray),
+            shape = RoundedCornerShape(10.dp)
+        )
+
+    ) {
+        Text(
+            text = toggleTexts.first,
+            color = if (checked) Color.Gray else Color.White,
+            fontWeight = if (checked) FontWeight.Medium else FontWeight.Bold,
+            modifier = Modifier
+                .weight(1f)
+                .background(
+                    color = if (checked) Color.Unspecified else DarkBlue,
+                    shape = RoundedCornerShape(10.dp, 0.dp, 0.dp, 10.dp)
+                )
+                .clickable { onCheckedChange(false) }
+                .padding(10.dp)
+        )
+        Text(
+            text = toggleTexts.second,
+            color = if (checked) Color.White else Color.Gray,
+            fontWeight = if (checked) FontWeight.Bold else FontWeight.Medium,
+            modifier = Modifier
+                .weight(1f)
+                .background(
+                    color = if (checked) DarkBlue else Color.Unspecified,
+                    shape = RoundedCornerShape(0.dp, 10.dp, 10.dp, 0.dp)
+                )
+                .clickable { onCheckedChange(true) }
+                .padding(10.dp)
+        )
     }
 }
 
@@ -131,10 +216,11 @@ fun BaseButton(label: String, onClick: () -> Unit) {
 fun BaseButtonWithIcon(modifier: Modifier, label: String, icon: ImageVector, onClick: () -> Unit) {
     Button(
         modifier = Modifier
-            .fillMaxWidth()
             .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp))
             .background(
-                color = Color.White,
+                brush = Brush.linearGradient(
+                    colors = listOf(MediumBlue, DarkBlue)
+                ),
                 shape = RoundedCornerShape(10.dp)
             )
             .then(modifier),
@@ -149,11 +235,11 @@ fun BaseButtonWithIcon(modifier: Modifier, label: String, icon: ImageVector, onC
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = label, color = Color.Black, fontWeight = FontWeight.Medium)
+            Text(text = label, color = Color.White, fontWeight = FontWeight.Medium)
             Icon(
                 imageVector = icon,
                 contentDescription = icon.name,
-                tint = DarkBlue,
+                tint = Color.White,
                 modifier = Modifier.size(30.dp)
             )
         }
@@ -165,7 +251,7 @@ fun BaseButtonWithIcon(modifier: Modifier, label: String, icon: ImageVector, onC
 fun BaseIndicator(
     size: Dp = 42.dp,
     sweepAngle: Float = 90f,
-    color: Color = MaterialTheme.colors.primary,
+    color: Color = DarkBlue,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
 ) {
     val transition = rememberInfiniteTransition()
@@ -189,7 +275,7 @@ fun BaseIndicator(
             .size(size) // canvas size
             .padding(strokeWidth / 2)
     ) {
-        drawCircle(Color.LightGray, style = stroke)
+        drawCircle(Color.White, style = stroke)
         drawArc(
             color,
             startAngle = currentArcStartAngle.toFloat() - 90,

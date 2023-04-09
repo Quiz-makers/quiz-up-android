@@ -2,18 +2,21 @@ package com.quizmakers.quizup.presentation.dashboard
 
 import androidx.lifecycle.viewModelScope
 import com.quizmakers.core.api.exception.ErrorMapper
+import com.quizmakers.core.data.quizzes.remote.QuizResponseApi
 import com.quizmakers.core.domain.dashboard.useCases.CoreLogOutUseCase
-import com.quizmakers.core.domain.dashboard.useCases.CoreGetQuizzesUseCase
+import com.quizmakers.core.domain.dashboard.useCases.CoreGetPublicQuizzesUseCase
+import com.quizmakers.core.domain.dashboard.useCases.CoreGetUserQuizzesUseCase
 import com.quizmakers.quizup.core.base.BaseViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
+
 
 @KoinViewModel
 class DashboardScreenViewModel(
     private val coreLogOutUseCase: CoreLogOutUseCase,
-    private val coreGetQuizzesUseCase: CoreGetQuizzesUseCase,
+    private val coreGetPublicQuizzesUseCase: CoreGetPublicQuizzesUseCase,
+    private val coreGetUserQuizzesUseCase: CoreGetUserQuizzesUseCase,
     private val errorMapper: ErrorMapper,
 ) : BaseViewModel() {
 
@@ -29,10 +32,10 @@ class DashboardScreenViewModel(
         viewModelScope.launch {
             _dashboardState.emit(DashboardState.Loading)
             runCatching {
-                coreGetQuizzesUseCase.invoke()
+                Pair(coreGetPublicQuizzesUseCase.invoke(), coreGetUserQuizzesUseCase.invoke())
             }.onFailure {
                 errorMapper.map(it).also { errorMessage ->
-                    sendMessageEvent(AuthEvent.Error(errorMessage))
+                    sendMessageEvent(MessageEvent.Error(errorMessage))
                     _dashboardState.emit(DashboardState.Error(errorMessage))
                 }
             }.onSuccess {
@@ -46,7 +49,7 @@ class DashboardScreenViewModel(
     sealed class DashboardState {
         object None : DashboardState()
         object Loading : DashboardState()
-        data class Success(val quizzesList: List<String>) : DashboardState()
+        data class Success(val data: Pair<List<QuizResponseApi>, List<QuizResponseApi>>) : DashboardState()
         data class Error(val error: String) : DashboardState()
     }
 }
