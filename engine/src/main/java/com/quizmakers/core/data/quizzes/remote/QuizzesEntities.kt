@@ -2,9 +2,8 @@ package com.quizmakers.core.data.quizzes.remote
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.util.Base64
-import okio.ByteString.Companion.decodeBase64
+import com.google.gson.annotations.SerializedName
 
 
 data class Question(
@@ -29,7 +28,6 @@ data class QuestionAnswered(
 )
 
 data class QuizRequestApi(
-    val ownerId: Int,
     val title: String,
     val metaTitle: String,
     val summary: String,
@@ -37,7 +35,29 @@ data class QuizRequestApi(
     val type: Int,
     val categoryId: Int,
     val score: Int,
-    val publicAvailable: Boolean
+    val publicAvailable: Boolean,
+    @SerializedName("quizQuestionsWithAnswersEntities")
+    val quizQuestions: Map<String, QuizQuestionApi>
+)
+
+data class QuizQuestionApi(
+    val type: String,
+    val question: String,
+    @SerializedName("questionImage")
+    val questionImages: List<String>,
+    val score: Int,
+    @SerializedName("difficultyLevel")
+    val difficulty: Int,
+    @SerializedName("visibleInQuiz")
+    val visible: Boolean,
+    @SerializedName("questionAnswersEntities")
+    val questionAnswers: List<QuestionAnswer>
+)
+
+data class QuestionAnswer(
+    val answer: String,
+    val correct: Boolean,
+    val active: Boolean
 )
 
 data class QuizResponseApi(
@@ -58,7 +78,7 @@ data class QuizResponseApi(
     val ownerName: String?,
     val ownerSurname: String?,
     val quizTime: Int?,
-    val description: String?
+    val description: String
 )
 
 data class QuestionsRequestApi(
@@ -73,3 +93,25 @@ data class CategoryApi(
     val category: String,
     val thumbnail: String
 )
+
+fun QuestionsRequestApi.toQuizQuestionApi(): Map<String, QuizQuestionApi =
+    questions.indices.associate { i ->
+        "additionalProp$i" to QuizQuestionApi(
+            type = "",
+            question = questions[i],
+            questionImages = image[i]?.let { listOf(it) } ?: emptyList(),
+            score = 10,
+            difficulty = 10,
+            visible = true,
+            questionAnswers = Pair(correctAnswers[i], answers[i]).toQuestionAnswer()
+        )
+    }
+
+private fun Pair<Int, List<String>>.toQuestionAnswer(): List<QuestionAnswer> =
+    second.mapIndexed { index, answer ->
+        QuestionAnswer(
+            answer = answer,
+            correct = index == first,
+            active = true
+        )
+    }

@@ -154,11 +154,11 @@ private fun DashboardData(
                 onClick = navigateToQuizDetailsBottomSheet
             )
             if (userQuizzes.isNotEmpty())
-            Text(
-                text = stringResource(R.string.my_quiz),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
+                Text(
+                    text = stringResource(R.string.my_quiz),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
             Spacer(modifier = Modifier.height(8.dp))
             QuizzesList(
                 cardData = userQuizzes,
@@ -303,7 +303,12 @@ private fun DestinationsNavigator.navigateToSignInScreen() {
 }
 
 private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet(quizResponseApi: QuizResponseApi) {
-    navigate(QuizDetailsBottomSheetDestination(quizResponseApi.quizId.toString()))
+    navigate(
+        QuizDetailsBottomSheetDestination(
+            quizResponseApi.quizId.toString(),
+            quizResponseApi.description
+        )
+    )
 }
 
 
