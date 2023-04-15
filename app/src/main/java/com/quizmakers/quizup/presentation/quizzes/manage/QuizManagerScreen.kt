@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -61,7 +62,7 @@ fun QuizManagerScreen(
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
                 BaseViewModel.MessageEvent.Success -> {
-                    snackbarHandler.showSuccessSnackbar(message = "Dodano quiz ! 🔮")
+                    snackbarHandler.showSuccessSnackbar(R.string.add_quiz_success)
                     navigator.navigateUp()
                 }
             }
@@ -362,7 +363,10 @@ fun QuestionItem(
     onImageAdd: (Uri) -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .width(300.dp)
+            .fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(value = question,
@@ -441,7 +445,7 @@ fun QuestionItem(
                 modifier = Modifier.size(120.dp)
             ) {
                 Icon(
-                    painter = rememberAsyncImagePainter(model = R.drawable.add_image_ic),
+                    painter = painterResource(R.drawable.add_image_ic),
                     contentDescription = Icons.Default.MoreVert.name,
                     tint = DarkBlue,
                     modifier = Modifier.size(60.dp)

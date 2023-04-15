@@ -41,4 +41,7 @@
     <string name="add_category">Dodaj kategorię</string>
     <string name="enter_question">Wprowadż pytanie</string>
     <string name="enter_answer">Wprowadż odpowiedź</string>
+    <string name="add_quiz_success">Dodano quiz ! 🔮</string>
+    <string name="signout_complite">Pomyślnie zażono konto! 🧁\n Teraz możesz się zalogować.</string>
+    <string name="not_found">Nie znaleziono quizu lub zostal już dodany🙃</string>
 </resources>

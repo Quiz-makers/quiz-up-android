@@ -23,4 +23,10 @@ class QuizzesRepositoryImpl(
             api.getUserQuizzes()
         }
     }
+
+    override suspend fun getQuizByCode(code: String): QuizResponseApi =
+        callOrThrow(errorWrapper) {
+            api.getQuizByCode(quizCode = code)
+        }
+
 }
