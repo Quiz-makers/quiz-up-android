@@ -22,7 +22,7 @@ class QuizManagerViewModel(
 ) : BaseViewModel() {
 
     private val _quizManagerState = MutableStateFlow<QuizManagerState>(QuizManagerState.None)
-    val categoriesState = _quizManagerState.asStateFlow()
+    val quizManagerState = _quizManagerState.asStateFlow()
 
     private val _addedState = MutableStateFlow<AddQuizState>(AddQuizState.Loaded)
     val addedState = _addedState.asStateFlow()
@@ -76,6 +76,7 @@ class QuizManagerViewModel(
                     _addedState.emit(AddQuizState.Loaded)
                 }
             }.onSuccess {
+                sendMessageEvent(MessageEvent.Success)
                 _addedState.emit(AddQuizState.Loaded)
             }
         }

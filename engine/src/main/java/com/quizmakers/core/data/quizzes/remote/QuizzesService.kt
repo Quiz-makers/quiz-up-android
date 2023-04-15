@@ -1,5 +1,6 @@
 package com.quizmakers.core.data.quizzes.remote
 
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -13,7 +14,7 @@ interface QuizzesService {
     suspend fun getUserQuizzes(): List<QuizResponseApi>
 
     @POST("/quizapp/quiz")
-    suspend fun addQuiz(@Body quizRequestApi: QuizRequestApi): Unit
+    suspend fun addQuiz(@Body quizRequestApi: QuizRequestApi): Response<Unit>
 
     @GET("/quizapp/quiz/categories")
     suspend fun getCategories(): List<CategoryApi>

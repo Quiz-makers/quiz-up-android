@@ -60,8 +60,10 @@ fun QuizManagerScreen(
                 is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
-                BaseViewModel.MessageEvent.Success ->
+                BaseViewModel.MessageEvent.Success -> {
+                    snackbarHandler.showSuccessSnackbar(message = "Dodano quiz ! 🔮")
                     navigator.navigateUp()
+                }
             }
         }
     }
@@ -89,7 +91,7 @@ fun QuizManagerScreen(
         QuizManagerScreen(
             addNewQuiz = quizManagerViewModel::addNewQuiz,
             getCategories = quizManagerViewModel::getCategories,
-            quizManagerState = quizManagerViewModel.categoriesState.collectAsStateWithLifecycle().value,
+            quizManagerState = quizManagerViewModel.quizManagerState.collectAsStateWithLifecycle().value,
             addedState = quizManagerViewModel.addedState.collectAsStateWithLifecycle().value,
         )
     }

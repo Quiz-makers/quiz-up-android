@@ -12,5 +12,5 @@ class CoreAddNewQuizUseCase(
     private val errorWrapper: ErrorWrapper
 ) {
     suspend operator fun invoke(quizRequestApi: QuizRequestApi) =
-        callOrThrow(errorWrapper) { api.addQuiz(quizRequestApi) }
+        callOrThrow(errorWrapper) { api.addQuiz(quizRequestApi).isSuccessful }
 }

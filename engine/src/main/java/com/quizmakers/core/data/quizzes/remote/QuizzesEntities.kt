@@ -94,10 +94,10 @@ data class CategoryApi(
     val thumbnail: String
 )
 
-fun QuestionsRequestApi.toQuizQuestionApi(): Map<String, QuizQuestionApi =
+fun QuestionsRequestApi.toQuizQuestionApi(): Map<String, QuizQuestionApi> =
     questions.indices.associate { i ->
-        "additionalProp$i" to QuizQuestionApi(
-            type = "",
+        "q$i" to QuizQuestionApi(
+            type = "1",
             question = questions[i],
             questionImages = image[i]?.let { listOf(it) } ?: emptyList(),
             score = 10,
