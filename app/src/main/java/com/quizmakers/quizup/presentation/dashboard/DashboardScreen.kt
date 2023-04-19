@@ -112,9 +112,12 @@ private fun DashboardScreen(
                 is DashboardState.Success -> {
                     val publicQuizzes = dashboardState.data.first
                     val userQuizzes = dashboardState.data.second
+                    val singleBoxPublic = if (publicQuizzes.size % 2 != 0) 125 else 0
+                    val singleBoxUser = if (userQuizzes.size % 2 != 0) 125 else 0
                     boxSizePublic.value =
-                        ((publicQuizzes.size / 2) * 100) + (publicQuizzes.size / 2) * 25
-                    boxSizeUser.value = ((userQuizzes.size / 2) * 100) + (userQuizzes.size / 2) * 25
+                        ((publicQuizzes.size / 2) * 100) + (publicQuizzes.size / 2) * 25 + singleBoxPublic
+                    boxSizeUser.value =
+                        ((userQuizzes.size / 2) * 100) + (userQuizzes.size / 2) * 25 + singleBoxUser
                     DashboardData(
                         navigateQuizManagerScreen = navigateQuizManagerScreen,
                         publicQuizzes = publicQuizzes,

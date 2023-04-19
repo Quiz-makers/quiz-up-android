@@ -27,6 +27,6 @@ interface QuizzesService {
     @POST("/quizapp/finish")
     suspend fun finishQuiz(@Body result: QuizResult): Response<Unit>
 
-    @POST("/quizapp/start/{id}")
+    @GET("/quizapp/start/{id}")
     suspend fun startQuiz(@Path("id") id: String): QuizResponse
 }

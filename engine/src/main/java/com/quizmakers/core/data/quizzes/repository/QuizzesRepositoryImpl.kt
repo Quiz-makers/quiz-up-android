@@ -4,6 +4,7 @@ import com.quizmakers.core.api.exception.ErrorWrapper
 import com.quizmakers.core.api.exception.callOrThrow
 import com.quizmakers.core.data.quizzes.remote.QuizResponseApi
 import com.quizmakers.core.data.quizzes.remote.QuizzesService
+import com.quizmakers.core.data.quizzes.remote.mockQuiz
 import com.quizmakers.core.domain.dashboard.repository.QuizzesRepository
 import org.koin.core.annotation.Factory
 
@@ -14,7 +15,7 @@ class QuizzesRepositoryImpl(
 ) : QuizzesRepository {
     override suspend fun getPublicQuizzes(): List<QuizResponseApi> {
         return callOrThrow(errorWrapper) {
-            api.getPublicQuizzes()
+            api.getPublicQuizzes().toMutableList().also { it.add(mockQuiz) }
         }
     }
 

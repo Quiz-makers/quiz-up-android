@@ -7,9 +7,10 @@ import com.quizmakers.core.api.exception.ErrorMapper
 import com.quizmakers.core.data.quizzes.remote.AnswerDto
 import com.quizmakers.core.data.quizzes.remote.QuestionApi
 import com.quizmakers.core.data.quizzes.remote.QuizResult
+import com.quizmakers.core.data.quizzes.remote.mockedQuestion
 import com.quizmakers.core.domain.quizzes.useCases.CoreGetQuizDetailsUseCase
 import com.quizmakers.core.domain.quizzes.useCases.CoreSendQuizResultUseCase
-import com.quizmakers.core.domain.quizzes.useCases.questionsMocks
+import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,16 +44,20 @@ class QuizScreenViewModel(
 
             _quizState.emit(QuizState.Loading)
             runCatching {
-                //  delay(1200)
                 coreGetQuizDetailsUseCase.invoke(quizId)
             }.onFailure {
                 errorMapper.map(it).also { errorMessage ->
-                    _quizState.emit(QuizState.Success(questionsMocks))
-              //      sendMessageEvent(MessageEvent.Error(errorMessage))
-                  //  _quizState.emit(QuizState.Error(errorMessage))
+                     _quizState.emit(QuizState.Success(mockedQuestion)) //TODO FOR TEST ONLY
+                    sendMessageEvent(MessageEvent.Error(errorMessage))
+                    //_quizState.emit(QuizState.Error(errorMessage))
                 }
             }.onSuccess {
-                _quizState.emit(QuizState.Success(it.questionDtoSet))
+                if (it.questionDtoSet.isNotEmpty()) {
+                    _quizState.emit(QuizState.Success(it.questionDtoSet))
+                } else {
+                    sendMessageEvent(MessageEvent.Error(errorMapper.getMessage(R.string.empty_array)))
+                    _quizState.emit(QuizState.None)
+                }
             }
         }
     }

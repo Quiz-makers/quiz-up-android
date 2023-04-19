@@ -80,7 +80,7 @@ private fun QuizScreen(
     finishQuiz: () -> Unit,
 ) {
     val currentQuestionIndex = remember { mutableStateOf(0) }
-    val selectedAnswer = remember { mutableStateOf(-1) }
+    val selectedAnswer = remember { mutableStateOf<AnswerApi?>(null) }
     val isAnswered = remember { mutableStateOf(false) }
     val buttonLoadingState = remember { mutableStateOf(false) }
     val quizJustEnd = remember { mutableStateOf(false) }
@@ -199,7 +199,7 @@ fun QuizSummary(
 private fun QuizLayout(
     currentQuestionIndex: MutableState<Int>,
     questionApi: List<QuestionApi>,
-    selectedAnswer: MutableState<Int>,
+    selectedAnswer: MutableState<AnswerApi?>,
     isAnswered: MutableState<Boolean>,
     buttonLoadingState: MutableState<Boolean>,
     score: MutableState<Int>,
@@ -210,16 +210,15 @@ private fun QuizLayout(
     val scope = rememberCoroutineScope()
 
     fun quizAnsweredAction() {
-
         addAnswer(
             AnswerDto(
                 questionApi[currentQuestionIndex.value].questionId,
-                selectedAnswer.value
+                selectedAnswer.value?.id
             )
         )
         isAnswered.value = true
         buttonLoadingState.value = true
-        if (selectedAnswer.value == questionApi[currentQuestionIndex.value].correctAnswer) {
+        if (selectedAnswer.value?.isCorrect == true) {
             score.value++
         }
         scope.launch {
@@ -230,7 +229,7 @@ private fun QuizLayout(
             isAnswered.value = false
             if (currentQuestionIndex.value < questionApi.lastIndex) {
                 currentQuestionIndex.value++
-                selectedAnswer.value = (-1)
+                selectedAnswer.value = null
             } else {
                 quizJustEnd.value = true
             }
@@ -307,10 +306,10 @@ private fun QuizLayout(
                     AnswerOption(
                         isClickable = count > 0,
                         option = option,
-                        isSelected = option.id == selectedAnswer.value,
+                        isSelected = option.id == selectedAnswer.value?.id,
                         onOptionSelected = { selectedAnswer.value = it },
                         isAnswered = isAnswered.value,
-                        isCorrectAnswer = option.id == questionApi[currentQuestionIndex.value].correctAnswer
+                        isCorrectAnswer = option.isCorrect
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
@@ -319,7 +318,7 @@ private fun QuizLayout(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = { quizAnsweredAction() },
-            enabled = selectedAnswer.value != (-1) && !buttonLoadingState.value,
+            enabled = selectedAnswer.value != null && !buttonLoadingState.value,
             modifier = Modifier.align(Alignment.End)
         ) {
             if (buttonLoadingState.value)
@@ -335,7 +334,7 @@ fun AnswerOption(
     isClickable: Boolean,
     option: AnswerApi,
     isSelected: Boolean,
-    onOptionSelected: (Int) -> Unit,
+    onOptionSelected: (AnswerApi) -> Unit,
     isAnswered: Boolean,
     isCorrectAnswer: Boolean
 ) {
@@ -351,7 +350,7 @@ fun AnswerOption(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = if (isAnswered) backgroundCheckColor else backgroundColor)
-            .clickable(onClick = { onOptionSelected(option.id) }, enabled = isClickable)
+            .clickable(onClick = { onOptionSelected(option) }, enabled = isClickable)
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
