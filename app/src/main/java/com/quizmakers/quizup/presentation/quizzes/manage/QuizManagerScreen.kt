@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -20,13 +22,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,8 +66,10 @@ fun QuizManagerScreen(
                 is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
-                BaseViewModel.MessageEvent.Success ->
+                BaseViewModel.MessageEvent.Success -> {
+                    snackbarHandler.showSuccessSnackbar(R.string.add_quiz_success)
                     navigator.navigateUp()
+                }
             }
         }
     }
@@ -89,7 +97,7 @@ fun QuizManagerScreen(
         QuizManagerScreen(
             addNewQuiz = quizManagerViewModel::addNewQuiz,
             getCategories = quizManagerViewModel::getCategories,
-            quizManagerState = quizManagerViewModel.categoriesState.collectAsStateWithLifecycle().value,
+            quizManagerState = quizManagerViewModel.quizManagerState.collectAsStateWithLifecycle().value,
             addedState = quizManagerViewModel.addedState.collectAsStateWithLifecycle().value,
         )
     }
@@ -171,7 +179,13 @@ private fun AddQuizLayout(
             Spacer(modifier = Modifier.height(4.dp))
             SpinnerCategory(selectedCategory, expanded, categories)
             Spacer(modifier = Modifier.height(4.dp))
-            AddQuizQuestions(questions, image, answers, correctAnswers)
+            AddQuizQuestions(
+                questions,
+                image,
+                answers,
+                correctAnswers,
+                focusManager
+            ) { keyboardController?.hide() }
             Spacer(modifier = Modifier.height(4.dp))
             when (addedState) {
                 QuizManagerViewModel.AddQuizState.Loaded -> BaseButtonWithIcon(
@@ -270,7 +284,9 @@ fun AddQuizQuestions(
     questions: SnapshotStateList<String>,
     image: SnapshotStateList<Uri?>,
     answers: SnapshotStateList<List<String>>,
-    correctAnswers: SnapshotStateList<Int>
+    correctAnswers: SnapshotStateList<Int>,
+    focusManager: FocusManager,
+    hideKeyboard: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -281,7 +297,8 @@ fun AddQuizQuestions(
             verticalAlignment = Alignment.Top
         ) {
             items(questions.size) { index ->
-                QuestionItem(question = questions[index],
+                QuestionItem(
+                    question = questions[index],
                     position = index + 1,
                     answers = answers[index],
                     imageUri = image[index],
@@ -295,7 +312,9 @@ fun AddQuizQuestions(
                         answers.removeAt(index)
                         correctAnswers.removeAt(index)
                     },
-                    onImageAdd = { image[index] = it }
+                    onImageAdd = { image[index] = it },
+                    focusManager = focusManager,
+                    hideKeyboard = hideKeyboard
                 )
             }
         }
@@ -358,9 +377,14 @@ fun QuestionItem(
     onCorrectAnswerChange: (Int) -> Unit,
     onDeleteItem: (Int) -> Unit,
     onImageAdd: (Uri) -> Unit,
+    focusManager: FocusManager,
+    hideKeyboard: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .width(300.dp)
+            .fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(value = question,
@@ -399,14 +423,18 @@ fun QuestionItem(
         Spacer(modifier = Modifier.height(4.dp))
         // answers
         answers.forEachIndexed { index, answer ->
-            AnswerItem(answer = answer,
+            AnswerItem(
+                answer = answer,
                 isCorrect = index == correctAnswer,
                 onAnswerChange = { newAnswer ->
                     val updatedAnswers = answers.toMutableList()
                     updatedAnswers[index] = newAnswer
                     onAnswerChange(updatedAnswers)
                 },
-                onCorrectAnswerChange = { onCorrectAnswerChange(index) })
+                onCorrectAnswerChange = { onCorrectAnswerChange(index) },
+                focusManager = focusManager,
+                hideKeyboard = { if (answers.size - 1 == index) hideKeyboard.invoke() }
+            )
         }
         //Add Image 
         var selectImage by remember { mutableStateOf<Uri?>(imageUri) }
@@ -439,7 +467,7 @@ fun QuestionItem(
                 modifier = Modifier.size(120.dp)
             ) {
                 Icon(
-                    painter = rememberAsyncImagePainter(model = R.drawable.add_image_ic),
+                    painter = painterResource(R.drawable.add_image_ic),
                     contentDescription = Icons.Default.MoreVert.name,
                     tint = DarkBlue,
                     modifier = Modifier.size(60.dp)
@@ -455,7 +483,9 @@ fun AnswerItem(
     answer: String,
     isCorrect: Boolean,
     onAnswerChange: (String) -> Unit,
-    onCorrectAnswerChange: () -> Unit
+    onCorrectAnswerChange: () -> Unit,
+    focusManager: FocusManager,
+    hideKeyboard: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -469,6 +499,13 @@ fun AnswerItem(
             label = { Text(text = stringResource(R.string.enter_answer), fontSize = 14.sp) },
             shape = RoundedCornerShape(10.dp),
             singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                    hideKeyboard.invoke()
+                }
+            ),
             trailingIcon = {
                 IconButton(
                     onClick = onCorrectAnswerChange, modifier = Modifier.clip(CircleShape)

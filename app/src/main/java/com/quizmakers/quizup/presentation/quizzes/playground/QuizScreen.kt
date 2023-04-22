@@ -1,5 +1,7 @@
 package com.quizmakers.quizup.presentation.quizzes.playground
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,7 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.quizmakers.core.data.quizzes.remote.Question
+import com.quizmakers.core.data.quizzes.local.AnswerDisplayable
+import com.quizmakers.core.data.quizzes.local.QuestionDisplayable
+import com.quizmakers.core.data.quizzes.remote.AnswerDto
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.ui.common.*
@@ -39,6 +43,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Destination
 @Composable
 fun QuizScreen(
@@ -60,7 +65,9 @@ fun QuizScreen(
     QuizScreen(
         closeQuiz = navigator::navigateUp,
         quizState = quizScreenViewModel.quizState.collectAsStateWithLifecycle().value,
-        refresh = quizScreenViewModel::getQuiz
+        refresh = quizScreenViewModel::getQuiz,
+        addAnswer = quizScreenViewModel::addAnswer,
+        finishQuiz = quizScreenViewModel::finishQuiz
     )
 }
 
@@ -68,10 +75,12 @@ fun QuizScreen(
 private fun QuizScreen(
     closeQuiz: () -> Unit,
     quizState: QuizScreenViewModel.QuizState,
-    refresh: () -> Unit
+    refresh: () -> Unit,
+    addAnswer: (AnswerDto) -> Unit,
+    finishQuiz: () -> Unit,
 ) {
     val currentQuestionIndex = remember { mutableStateOf(0) }
-    val selectedAnswer = remember { mutableStateOf("") }
+    val selectedAnswer = remember { mutableStateOf<AnswerDisplayable?>(null) }
     val isAnswered = remember { mutableStateOf(false) }
     val buttonLoadingState = remember { mutableStateOf(false) }
     val quizJustEnd = remember { mutableStateOf(false) }
@@ -109,17 +118,19 @@ private fun QuizScreen(
                     true -> QuizSummary(
                         score = score,
                         answersSize = quizState.quizzesList.size,
-                        navToDashboardScreen = closeQuiz
+                        navToDashboardScreen = closeQuiz,
+                        finishQuiz = finishQuiz
                     )
                     false ->
                         QuizLayout(
                             quizJustEnd = quizJustEnd,
                             currentQuestionIndex = currentQuestionIndex,
-                            questions = quizState.quizzesList,
+                            questionApi = quizState.quizzesList,
                             selectedAnswer = selectedAnswer,
                             isAnswered = isAnswered,
                             buttonLoadingState = buttonLoadingState,
                             score = score,
+                            addAnswer = addAnswer
                         )
                 }
             }
@@ -133,8 +144,13 @@ private fun QuizScreen(
 fun QuizSummary(
     score: MutableState<Int>,
     navToDashboardScreen: () -> Unit,
-    answersSize: Int
-) {
+    answersSize: Int,
+    finishQuiz: () -> Unit,
+
+    ) {
+    LaunchedEffect(Unit) {
+        finishQuiz()
+    }
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -172,27 +188,37 @@ fun QuizSummary(
             label = stringResource(R.string.finish),
             icon = Icons.Default.Done,
             onClick = navToDashboardScreen,
-            modifier = Modifier.fillMaxWidth(0.5f).align(Alignment.CenterHorizontally))
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .align(Alignment.CenterHorizontally)
+        )
     }
 }
 
 @Composable
 private fun QuizLayout(
     currentQuestionIndex: MutableState<Int>,
-    questions: List<Question>,
-    selectedAnswer: MutableState<String>,
+    questionApi: List<QuestionDisplayable>,
+    selectedAnswer: MutableState<AnswerDisplayable?>,
     isAnswered: MutableState<Boolean>,
     buttonLoadingState: MutableState<Boolean>,
     score: MutableState<Int>,
     quizJustEnd: MutableState<Boolean>,
+    addAnswer: (AnswerDto) -> Unit,
 ) {
     var count by remember { mutableStateOf(10) }
     val scope = rememberCoroutineScope()
 
     fun quizAnsweredAction() {
+        addAnswer(
+            AnswerDto(
+                questionApi[currentQuestionIndex.value].questionId,
+                selectedAnswer.value?.id
+            )
+        )
         isAnswered.value = true
         buttonLoadingState.value = true
-        if (selectedAnswer.value == questions[currentQuestionIndex.value].correctAnswer) {
+        if (selectedAnswer.value?.isCorrect == true) {
             score.value++
         }
         scope.launch {
@@ -201,9 +227,9 @@ private fun QuizLayout(
             count = 10
             buttonLoadingState.value = false
             isAnswered.value = false
-            if (currentQuestionIndex.value < questions.lastIndex) {
+            if (currentQuestionIndex.value < questionApi.lastIndex) {
                 currentQuestionIndex.value++
-                selectedAnswer.value = ""
+                selectedAnswer.value = null
             } else {
                 quizJustEnd.value = true
             }
@@ -239,7 +265,7 @@ private fun QuizLayout(
                     Text(
                         textAlign = TextAlign.Start,
                         modifier = Modifier.weight(1f),
-                        text = stringResource(R.string.question) + "${currentQuestionIndex.value + 1}/${questions.size}",
+                        text = stringResource(R.string.question) + "${currentQuestionIndex.value + 1}/${questionApi.size}",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -256,12 +282,12 @@ private fun QuizLayout(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = questions[currentQuestionIndex.value].question,
+                    text = questionApi[currentQuestionIndex.value].question,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                questions[currentQuestionIndex.value].imageBitmap?.let {
+                questionApi[currentQuestionIndex.value].image?.let {
                     AsyncImage(
                         model = it,
                         contentDescription = null,
@@ -275,15 +301,15 @@ private fun QuizLayout(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Column {
-            questions[currentQuestionIndex.value].options.forEach { option ->
+            questionApi[currentQuestionIndex.value].answers.forEach { option ->
                 Card(elevation = 2.dp) {
                     AnswerOption(
                         isClickable = count > 0,
                         option = option,
-                        isSelected = option == selectedAnswer.value,
+                        isSelected = option.id == selectedAnswer.value?.id,
                         onOptionSelected = { selectedAnswer.value = it },
                         isAnswered = isAnswered.value,
-                        isCorrectAnswer = option == questions[currentQuestionIndex.value].correctAnswer
+                        isCorrectAnswer = option.isCorrect
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
@@ -292,7 +318,7 @@ private fun QuizLayout(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = { quizAnsweredAction() },
-            enabled = selectedAnswer.value.isNotBlank() && !buttonLoadingState.value,
+            enabled = selectedAnswer.value != null && !buttonLoadingState.value,
             modifier = Modifier.align(Alignment.End)
         ) {
             if (buttonLoadingState.value)
@@ -306,9 +332,9 @@ private fun QuizLayout(
 @Composable
 fun AnswerOption(
     isClickable: Boolean,
-    option: String,
+    option: AnswerDisplayable,
     isSelected: Boolean,
-    onOptionSelected: (String) -> Unit,
+    onOptionSelected: (AnswerDisplayable) -> Unit,
     isAnswered: Boolean,
     isCorrectAnswer: Boolean
 ) {
@@ -330,7 +356,7 @@ fun AnswerOption(
     ) {
 
         Text(
-            text = option,
+            text = option.answer,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             color = contentColor

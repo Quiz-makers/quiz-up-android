@@ -58,7 +58,8 @@ fun SignOutScreen(
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
                 BaseViewModel.MessageEvent.Success -> {
-                    navigator.navigateToDashboardScreen()
+                    snackbarHandler.showSuccessSnackbar(R.string.signout_complite)
+                    navigator.navigateUp()
                 }
             }
         }

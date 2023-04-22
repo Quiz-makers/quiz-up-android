@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -16,10 +17,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -33,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.quizmakers.core.data.quizzes.remote.QuizResponseApi
+import com.quizmakers.core.data.quizzes.local.QuizGeneralDisplayable
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.presentation.dashboard.DashboardScreenViewModel.DashboardState
@@ -54,15 +57,18 @@ import org.koin.androidx.compose.koinViewModel
 fun DashboardScreen(
     navigator: DestinationsNavigator,
     dashboardScreenViewModel: DashboardScreenViewModel = koinViewModel(),
-    snackbarHandler: SnackbarHandler,
+    snackbarHandler: SnackbarHandler
 ) {
     LaunchedEffect(Unit) {
+        dashboardScreenViewModel.getQuizzes()
         dashboardScreenViewModel.messageEvent.collect {
             when (it) {
                 is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
-                BaseViewModel.MessageEvent.Success -> Unit
+                BaseViewModel.MessageEvent.Success -> {
+                    snackbarHandler.showSuccessSnackbar(R.string.add_quiz_success)
+                }
             }
         }
     }
@@ -74,17 +80,21 @@ fun DashboardScreen(
         navigateToQuizDetailsBottomSheet = { navigator.navigateToQuizDetailsBottomSheet(it) },
         navigateQuizManagerScreen = { navigator.navigateQuizManagerScreen() },
         onRefresh = dashboardScreenViewModel::getQuizzes,
-        dashboardState = dashboardScreenViewModel.dashboardState.collectAsStateWithLifecycle().value
+        dashboardState = dashboardScreenViewModel.dashboardState.collectAsStateWithLifecycle().value,
+        userName = dashboardScreenViewModel.getUserName(),
+        getQuizByCode = dashboardScreenViewModel::getQuizByCode
     )
 }
 
 @Composable
 private fun DashboardScreen(
     navigateToSignInScreen: () -> Unit,
-    navigateToQuizDetailsBottomSheet: (QuizResponseApi) -> Unit,
+    navigateToQuizDetailsBottomSheet: (QuizGeneralDisplayable) -> Unit,
     onRefresh: () -> Unit,
     dashboardState: DashboardState,
-    navigateQuizManagerScreen: () -> Unit
+    navigateQuizManagerScreen: () -> Unit,
+    userName: String,
+    getQuizByCode: (String) -> Unit,
 ) {
     val boxSizePublic = remember { mutableStateOf(0) }
     val boxSizeUser = remember { mutableStateOf(0) }
@@ -94,7 +104,7 @@ private fun DashboardScreen(
             .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 0.dp)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            MainAppBar(navigateToSignInScreen)
+            MainAppBar(navigateToSignInScreen, userName)
             when (dashboardState) {
                 is DashboardState.Error -> ErrorScreen(onClick = onRefresh)
                 DashboardState.Loading -> LoadingScreen()
@@ -102,16 +112,20 @@ private fun DashboardScreen(
                 is DashboardState.Success -> {
                     val publicQuizzes = dashboardState.data.first
                     val userQuizzes = dashboardState.data.second
+                    val singleBoxPublic = if (publicQuizzes.size % 2 != 0) 125 else 0
+                    val singleBoxUser = if (userQuizzes.size % 2 != 0) 125 else 0
                     boxSizePublic.value =
-                        ((publicQuizzes.size / 2) * 100) + (publicQuizzes.size / 2) * 25
-                    boxSizeUser.value = ((userQuizzes.size / 2) * 100) + (userQuizzes.size / 2) * 25
+                        ((publicQuizzes.size / 2) * 100) + (publicQuizzes.size / 2) * 25 + singleBoxPublic
+                    boxSizeUser.value =
+                        ((userQuizzes.size / 2) * 100) + (userQuizzes.size / 2) * 25 + singleBoxUser
                     DashboardData(
                         navigateQuizManagerScreen = navigateQuizManagerScreen,
                         publicQuizzes = publicQuizzes,
                         userQuizzes = userQuizzes,
                         boxSizePublic = boxSizePublic,
                         boxSizeUser = boxSizeUser,
-                        navigateToQuizDetailsBottomSheet = navigateToQuizDetailsBottomSheet
+                        navigateToQuizDetailsBottomSheet = navigateToQuizDetailsBottomSheet,
+                        getQuizByCode = getQuizByCode
                     )
                 }
             }
@@ -123,12 +137,13 @@ private fun DashboardScreen(
 
 @Composable
 private fun DashboardData(
-    publicQuizzes: List<QuizResponseApi>,
-    userQuizzes: List<QuizResponseApi>,
+    publicQuizzes: List<QuizGeneralDisplayable>,
+    userQuizzes: List<QuizGeneralDisplayable>,
     boxSizePublic: MutableState<Int>,
     boxSizeUser: MutableState<Int>,
-    navigateToQuizDetailsBottomSheet: (QuizResponseApi) -> Unit,
+    navigateToQuizDetailsBottomSheet: (QuizGeneralDisplayable) -> Unit,
     navigateQuizManagerScreen: () -> Unit,
+    getQuizByCode: (String) -> Unit,
 ) {
 
     val search = remember { mutableStateOf(TextFieldValue("")) }
@@ -139,7 +154,7 @@ private fun DashboardData(
     ) {
         item {
             Spacer(modifier = Modifier.height(12.dp))
-            CodeCard(search)
+            CodeCard(search, getQuizByCode)
             Spacer(modifier = Modifier.height(8.dp))
             if (publicQuizzes.isNotEmpty())
                 Text(
@@ -154,11 +169,11 @@ private fun DashboardData(
                 onClick = navigateToQuizDetailsBottomSheet
             )
             if (userQuizzes.isNotEmpty())
-            Text(
-                text = stringResource(R.string.my_quiz),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
+                Text(
+                    text = stringResource(R.string.my_quiz),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
             Spacer(modifier = Modifier.height(8.dp))
             QuizzesList(
                 cardData = userQuizzes,
@@ -179,7 +194,7 @@ private fun DashboardData(
 
 @Composable
 @OptIn(ExperimentalTextApi::class)
-private fun MainAppBar(navigateToSignInScreen: () -> Unit) {
+private fun MainAppBar(navigateToSignInScreen: () -> Unit, userName: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             modifier = Modifier.weight(1f),
@@ -201,7 +216,7 @@ private fun MainAppBar(navigateToSignInScreen: () -> Unit) {
                         )
                     )
                 ) {
-                    append("Paweł 👋 ")
+                    append("$userName 👋 ")
                 }
             }
         )
@@ -221,8 +236,8 @@ private fun MainAppBar(navigateToSignInScreen: () -> Unit) {
 
 @Composable
 fun QuizzesList(
-    cardData: List<QuizResponseApi>, boxSize: Int,
-    onClick: (QuizResponseApi) -> Unit,
+    cardData: List<QuizGeneralDisplayable>, boxSize: Int,
+    onClick: (QuizGeneralDisplayable) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier.height(boxSize.dp),
@@ -239,8 +254,10 @@ fun QuizzesList(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun CodeCard(search: MutableState<TextFieldValue>) {
+private fun CodeCard(search: MutableState<TextFieldValue>, getQuizByCode: (String) -> Unit) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     Card(elevation = 10.dp) {
         Column(
             modifier = Modifier
@@ -254,7 +271,13 @@ private fun CodeCard(search: MutableState<TextFieldValue>) {
                 valueState = search,
                 trailingIcon = Icons.Default.Add,
                 placeholderText = stringResource(R.string.code),
-                labelText = stringResource(R.string.enter_code_info)
+                labelText = stringResource(R.string.enter_code_info),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        getQuizByCode(search.value.text)
+                    }
+                )
             )
         }
     }
@@ -302,8 +325,13 @@ private fun DestinationsNavigator.navigateToSignInScreen() {
     }
 }
 
-private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet(quizResponseApi: QuizResponseApi) {
-    navigate(QuizDetailsBottomSheetDestination(quizResponseApi.quizId.toString()))
+private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet(quiz: QuizGeneralDisplayable) {
+    navigate(
+        QuizDetailsBottomSheetDestination(
+            quiz.quizId.toString(),
+            quiz.description
+        )
+    )
 }
 
 
@@ -317,6 +345,6 @@ private fun DestinationsNavigator.navigateQuizManagerScreen() {
 @Composable
 private fun DashboardScreenPreview() {
     QuizUpTheme {
-        DashboardScreen({}, {}, {}, DashboardState.None) { }
+        DashboardScreen({}, {}, {}, DashboardState.None, { }, "", {})
     }
 }

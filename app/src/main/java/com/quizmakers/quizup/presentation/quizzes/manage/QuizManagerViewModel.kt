@@ -5,10 +5,10 @@ import com.quizmakers.core.api.exception.ErrorMapper
 import com.quizmakers.core.data.quizzes.remote.CategoryApi
 import com.quizmakers.core.data.quizzes.remote.QuestionsRequestApi
 import com.quizmakers.core.data.quizzes.remote.QuizRequestApi
+import com.quizmakers.core.data.quizzes.remote.toQuizQuestionApi
 import com.quizmakers.core.domain.quizzes.useCases.CoreAddNewQuizUseCase
 import com.quizmakers.core.domain.quizzes.useCases.CoreGetCategoriesUseCase
 import com.quizmakers.quizup.core.base.BaseViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -22,7 +22,7 @@ class QuizManagerViewModel(
 ) : BaseViewModel() {
 
     private val _quizManagerState = MutableStateFlow<QuizManagerState>(QuizManagerState.None)
-    val categoriesState = _quizManagerState.asStateFlow()
+    val quizManagerState = _quizManagerState.asStateFlow()
 
     private val _addedState = MutableStateFlow<AddQuizState>(AddQuizState.Loaded)
     val addedState = _addedState.asStateFlow()
@@ -35,7 +35,6 @@ class QuizManagerViewModel(
         viewModelScope.launch {
             _quizManagerState.emit(QuizManagerState.Loading)
             runCatching {
-              //  delay(1200)
                 coreGetCategoriesUseCase.invoke()
             }.onFailure {
                 errorMapper.map(it).also { errorMessage ->
@@ -58,10 +57,8 @@ class QuizManagerViewModel(
         viewModelScope.launch {
             _addedState.emit(AddQuizState.Loading)
             runCatching {
-               // delay(1200)
                 coreAddNewQuizUseCase.invoke(
                     QuizRequestApi(
-                        ownerId = 3,
                         title = title,
                         metaTitle = "",
                         summary = "Summary",
@@ -69,7 +66,8 @@ class QuizManagerViewModel(
                         type = 1,
                         categoryId = selectedCategoryId,
                         score = 10,
-                        publicAvailable = publicAvailable
+                        publicAvailable = publicAvailable,
+                        quizQuestions = questionsRequestApi.toQuizQuestionApi()
                     )
                 )
             }.onFailure {
@@ -78,6 +76,7 @@ class QuizManagerViewModel(
                     _addedState.emit(AddQuizState.Loaded)
                 }
             }.onSuccess {
+                sendMessageEvent(MessageEvent.Success)
                 _addedState.emit(AddQuizState.Loaded)
             }
         }

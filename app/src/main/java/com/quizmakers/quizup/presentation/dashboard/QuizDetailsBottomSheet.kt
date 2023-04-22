@@ -20,18 +20,18 @@ import com.ramcosta.composedestinations.spec.DestinationStyle
     style = DestinationStyle.BottomSheet::class
 )
 @Composable
-fun QuizDetailsBottomSheet(navigator: DestinationsNavigator, quizId: String) {
-    QuizDetailsBottomSheet(startQuiz = { navigator.navigateToQuizScreen(quizId) })
+fun QuizDetailsBottomSheet(navigator: DestinationsNavigator, quizId: String, desc: String) {
+    QuizDetailsBottomSheet(startQuiz = { navigator.navigateToQuizScreen(quizId) }, desc = desc)
 }
 
 @Composable
-private fun QuizDetailsBottomSheet(startQuiz: () -> Unit) {
+private fun QuizDetailsBottomSheet(startQuiz: () -> Unit, desc: String) {
     Column(
         Modifier
             .fillMaxWidth()
             .padding(15.dp)
     ) {
-        Text(text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.")
+        Text(text = desc)
         Spacer(modifier = Modifier.height(20.dp))
         Row(horizontalArrangement = Arrangement.SpaceBetween) {
             if (false) {

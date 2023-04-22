@@ -7,7 +7,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.ksp.generated.module
 
 class QuizUpApp : Application() {
-
     override fun onCreate() {
         super.onCreate()
         startKoin()
