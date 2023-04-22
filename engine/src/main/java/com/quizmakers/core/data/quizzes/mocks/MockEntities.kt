@@ -1,4 +1,8 @@
-package com.quizmakers.core.data.quizzes.remote
+package com.quizmakers.core.data.quizzes.mocks
+
+import com.quizmakers.core.data.quizzes.remote.AnswerApi
+import com.quizmakers.core.data.quizzes.remote.QuestionApi
+import com.quizmakers.core.data.quizzes.remote.QuizResponseApi
 
 var mockQuiz = QuizResponseApi(
     type = "multiple_choice",

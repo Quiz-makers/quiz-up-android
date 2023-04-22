@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.quizmakers.core.data.quizzes.remote.QuizResponseApi
+import com.quizmakers.core.data.quizzes.local.QuizGeneralDisplayable
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.presentation.dashboard.DashboardScreenViewModel.DashboardState
@@ -89,7 +89,7 @@ fun DashboardScreen(
 @Composable
 private fun DashboardScreen(
     navigateToSignInScreen: () -> Unit,
-    navigateToQuizDetailsBottomSheet: (QuizResponseApi) -> Unit,
+    navigateToQuizDetailsBottomSheet: (QuizGeneralDisplayable) -> Unit,
     onRefresh: () -> Unit,
     dashboardState: DashboardState,
     navigateQuizManagerScreen: () -> Unit,
@@ -137,11 +137,11 @@ private fun DashboardScreen(
 
 @Composable
 private fun DashboardData(
-    publicQuizzes: List<QuizResponseApi>,
-    userQuizzes: List<QuizResponseApi>,
+    publicQuizzes: List<QuizGeneralDisplayable>,
+    userQuizzes: List<QuizGeneralDisplayable>,
     boxSizePublic: MutableState<Int>,
     boxSizeUser: MutableState<Int>,
-    navigateToQuizDetailsBottomSheet: (QuizResponseApi) -> Unit,
+    navigateToQuizDetailsBottomSheet: (QuizGeneralDisplayable) -> Unit,
     navigateQuizManagerScreen: () -> Unit,
     getQuizByCode: (String) -> Unit,
 ) {
@@ -236,8 +236,8 @@ private fun MainAppBar(navigateToSignInScreen: () -> Unit, userName: String) {
 
 @Composable
 fun QuizzesList(
-    cardData: List<QuizResponseApi>, boxSize: Int,
-    onClick: (QuizResponseApi) -> Unit,
+    cardData: List<QuizGeneralDisplayable>, boxSize: Int,
+    onClick: (QuizGeneralDisplayable) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier.height(boxSize.dp),
@@ -325,11 +325,11 @@ private fun DestinationsNavigator.navigateToSignInScreen() {
     }
 }
 
-private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet(quizResponseApi: QuizResponseApi) {
+private fun DestinationsNavigator.navigateToQuizDetailsBottomSheet(quiz: QuizGeneralDisplayable) {
     navigate(
         QuizDetailsBottomSheetDestination(
-            quizResponseApi.quizId.toString(),
-            quizResponseApi.description
+            quiz.quizId.toString(),
+            quiz.description
         )
     )
 }

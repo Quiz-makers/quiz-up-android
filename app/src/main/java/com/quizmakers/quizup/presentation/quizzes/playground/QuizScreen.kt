@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.quizmakers.core.data.quizzes.remote.AnswerApi
+import com.quizmakers.core.data.quizzes.local.AnswerDisplayable
+import com.quizmakers.core.data.quizzes.local.QuestionDisplayable
 import com.quizmakers.core.data.quizzes.remote.AnswerDto
-import com.quizmakers.core.data.quizzes.remote.QuestionApi
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.ui.common.*
@@ -80,7 +80,7 @@ private fun QuizScreen(
     finishQuiz: () -> Unit,
 ) {
     val currentQuestionIndex = remember { mutableStateOf(0) }
-    val selectedAnswer = remember { mutableStateOf<AnswerApi?>(null) }
+    val selectedAnswer = remember { mutableStateOf<AnswerDisplayable?>(null) }
     val isAnswered = remember { mutableStateOf(false) }
     val buttonLoadingState = remember { mutableStateOf(false) }
     val quizJustEnd = remember { mutableStateOf(false) }
@@ -198,8 +198,8 @@ fun QuizSummary(
 @Composable
 private fun QuizLayout(
     currentQuestionIndex: MutableState<Int>,
-    questionApi: List<QuestionApi>,
-    selectedAnswer: MutableState<AnswerApi?>,
+    questionApi: List<QuestionDisplayable>,
+    selectedAnswer: MutableState<AnswerDisplayable?>,
     isAnswered: MutableState<Boolean>,
     buttonLoadingState: MutableState<Boolean>,
     score: MutableState<Int>,
@@ -287,7 +287,7 @@ private fun QuizLayout(
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                questionApi[currentQuestionIndex.value].imageBitmap?.let {
+                questionApi[currentQuestionIndex.value].image?.let {
                     AsyncImage(
                         model = it,
                         contentDescription = null,
@@ -301,7 +301,7 @@ private fun QuizLayout(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Column {
-            questionApi[currentQuestionIndex.value].answerDtoSet.forEach { option ->
+            questionApi[currentQuestionIndex.value].answers.forEach { option ->
                 Card(elevation = 2.dp) {
                     AnswerOption(
                         isClickable = count > 0,
@@ -332,9 +332,9 @@ private fun QuizLayout(
 @Composable
 fun AnswerOption(
     isClickable: Boolean,
-    option: AnswerApi,
+    option: AnswerDisplayable,
     isSelected: Boolean,
-    onOptionSelected: (AnswerApi) -> Unit,
+    onOptionSelected: (AnswerDisplayable) -> Unit,
     isAnswered: Boolean,
     isCorrectAnswer: Boolean
 ) {

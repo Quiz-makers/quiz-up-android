@@ -4,10 +4,9 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewModelScope
 import com.quizmakers.core.api.exception.ErrorMapper
+import com.quizmakers.core.data.quizzes.local.QuestionDisplayable
 import com.quizmakers.core.data.quizzes.remote.AnswerDto
-import com.quizmakers.core.data.quizzes.remote.QuestionApi
 import com.quizmakers.core.data.quizzes.remote.QuizResult
-import com.quizmakers.core.data.quizzes.remote.mockedQuestion
 import com.quizmakers.core.domain.quizzes.useCases.CoreGetQuizDetailsUseCase
 import com.quizmakers.core.domain.quizzes.useCases.CoreSendQuizResultUseCase
 import com.quizmakers.quizup.R
@@ -47,9 +46,8 @@ class QuizScreenViewModel(
                 coreGetQuizDetailsUseCase.invoke(quizId)
             }.onFailure {
                 errorMapper.map(it).also { errorMessage ->
-                     _quizState.emit(QuizState.Success(mockedQuestion)) //TODO FOR TEST ONLY
                     sendMessageEvent(MessageEvent.Error(errorMessage))
-                    //_quizState.emit(QuizState.Error(errorMessage))
+                    _quizState.emit(QuizState.Error(errorMessage))
                 }
             }.onSuccess {
                 if (it.questionDtoSet.isNotEmpty()) {
@@ -79,7 +77,7 @@ class QuizScreenViewModel(
     sealed class QuizState {
         object None : QuizState()
         object Loading : QuizState()
-        data class Success(val quizzesList: List<QuestionApi>) : QuizState()
+        data class Success(val quizzesList: List<QuestionDisplayable>) : QuizState()
         data class Error(val error: String) : QuizState()
     }
 }

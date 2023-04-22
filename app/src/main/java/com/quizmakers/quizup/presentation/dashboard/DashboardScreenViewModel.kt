@@ -2,7 +2,7 @@ package com.quizmakers.quizup.presentation.dashboard
 
 import androidx.lifecycle.viewModelScope
 import com.quizmakers.core.api.exception.ErrorMapper
-import com.quizmakers.core.data.quizzes.remote.QuizResponseApi
+import com.quizmakers.core.data.quizzes.local.QuizGeneralDisplayable
 import com.quizmakers.core.domain.dashboard.useCases.CoreLogOutUseCase
 import com.quizmakers.core.domain.dashboard.useCases.CoreGetPublicQuizzesUseCase
 import com.quizmakers.core.domain.dashboard.useCases.CoreGetQuizByCodeUseCase
@@ -68,7 +68,7 @@ class DashboardScreenViewModel(
     sealed class DashboardState {
         object None : DashboardState()
         object Loading : DashboardState()
-        data class Success(val data: Pair<List<QuizResponseApi>, List<QuizResponseApi>>) :
+        data class Success(val data: Pair<List<QuizGeneralDisplayable>, List<QuizGeneralDisplayable>>) :
             DashboardState()
 
         data class Error(val error: String) : DashboardState()

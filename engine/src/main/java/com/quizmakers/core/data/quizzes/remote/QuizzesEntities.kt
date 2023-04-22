@@ -1,27 +1,29 @@
 package com.quizmakers.core.data.quizzes.remote
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.util.Base64
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
 
+//Quiz Start
+data class QuizResponse(
+    val quizId: Int,
+    val title: String,
+    val description: String,
+    val questionDtoSet: List<QuestionApi>
+)
 
 data class QuestionApi(
     val questionId: Int,
     val question: String,
     val answerDtoSet: List<AnswerApi>,
     @SerializedName("image") val imageBase64: String?
-    //"https://fajnepodroze.pl/wp-content/uploads/2020/03/Krajobraz.jpg"
-) {
-    val imageBitmap = mock?.decodeImage()
+)
 
-    // TODO Takie parsery powinny być robione w warstwie przezentacji w data trzeba zmienić to później .
-    private fun String.decodeImage(): Bitmap {
-        val byteArray = Base64.decode(this, Base64.DEFAULT)
-        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-    }
-}
+//
+data class AnswerApi(
+    val id: Int,
+    val answer: String,
+    val isCorrect: Boolean
+)
 
 data class QuizRequestApi(
     val title: String,
@@ -40,7 +42,7 @@ data class QuizQuestionApi(
     val type: String,
     val question: String,
     @SerializedName("questionImage")
-    val questionImages: List<String>,
+    val questionImages: String,
     val score: Int,
     @SerializedName("difficultyLevel")
     val difficulty: Int,
@@ -61,7 +63,7 @@ data class QuizResponseApi(
     val category: String?,
     val title: String,
     val createdDate: String?,
-    val quizId: Int?,
+    val quizId: Int,
     val score: Int?,
     val publicAvailable: Boolean?,
     val metaTitle: String?,
@@ -95,9 +97,9 @@ fun QuestionsRequestApi.toQuizQuestionApi(): Map<String, QuizQuestionApi> =
         "q$i" to QuizQuestionApi(
             type = "1",
             question = questions[i],
-            questionImages = image[i]?.let { listOf(it) } ?: emptyList(),
-            score = 10,
-            difficulty = 10,
+            questionImages = image[i] ?: "",
+            score = 1,
+            difficulty = 1,
             visible = true,
             questionAnswers = Pair(correctAnswers[i], answers[i]).toQuestionAnswer()
         )
@@ -112,18 +114,6 @@ private fun Pair<Int, List<String>>.toQuestionAnswer(): List<QuestionAnswer> =
         )
     }
 
-data class QuizResponse(
-    val quizId: Int,
-    val title: String,
-    val description: String,
-    val questionDtoSet: List<QuestionApi>
-)
-
-data class AnswerApi(
-    val id: Int,
-    val answer: String,
-    val isCorrect: Boolean
-)
 
 data class QuizResult(
     val quizId: Int,
