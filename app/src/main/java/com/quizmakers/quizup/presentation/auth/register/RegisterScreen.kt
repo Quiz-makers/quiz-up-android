@@ -1,4 +1,4 @@
-package com.quizmakers.quizup.presentation.auth.signOut
+package com.quizmakers.quizup.presentation.auth.register
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -42,7 +42,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SignOutScreen(
     navigator: DestinationsNavigator,
-    signOutViewModel: SignOutViewModel = koinViewModel(),
+    registerViewModel: RegisterViewModel = koinViewModel(),
     snackbarHandler: SnackbarHandler,
 ) {
     val name = remember { mutableStateOf(TextFieldValue("")) }
@@ -52,7 +52,7 @@ fun SignOutScreen(
     val password = remember { mutableStateOf(TextFieldValue("")) }
 
     LaunchedEffect(Unit) {
-        signOutViewModel.messageEvent.collect {
+        registerViewModel.messageEvent.collect {
             when (it) {
                 is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
@@ -64,8 +64,8 @@ fun SignOutScreen(
             }
         }
     }
-    when (val authState = signOutViewModel.authState.collectAsStateWithLifecycle().value) {
-        SignOutViewModel.AuthState.Loading -> LoadingScreen()
+    when (val authState = registerViewModel.authState.collectAsStateWithLifecycle().value) {
+        RegisterViewModel.AuthState.Loading -> LoadingScreen()
         else -> {
             SignOutScreen(
                 authState = authState,
@@ -75,7 +75,7 @@ fun SignOutScreen(
                 email = email,
                 password = password,
                 navigateBack = navigator::popBackStack,
-                signOut = signOutViewModel::signOut,
+                register = registerViewModel::register,
             )
         }
     }
@@ -92,8 +92,8 @@ fun SignOutScreen(
     userName: MutableState<TextFieldValue>,
     email: MutableState<TextFieldValue>,
     password: MutableState<TextFieldValue>,
-    authState: SignOutViewModel.AuthState,
-    signOut: (String, String, String, String, String) -> Unit
+    authState: RegisterViewModel.AuthState,
+    register: (String, String, String, String, String) -> Unit
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -175,8 +175,8 @@ fun SignOutScreen(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        signOut(
-                            signOut,
+                        register(
+                            register,
                             name,
                             surname,
                             userName,
@@ -190,7 +190,7 @@ fun SignOutScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             BaseButton(label = stringResource(id = R.string.register), onClick = {
-                signOut.invoke(
+                register.invoke(
                     name.value.text,
                     surname.value.text,
                     userName.value.text,
@@ -203,15 +203,9 @@ fun SignOutScreen(
     }
 }
 
-private fun DestinationsNavigator.navigateToDashboardScreen() {
-    navigate(DashboardScreenDestination()) {
-        popBackStack()
-    }
-}
-
 @Composable
 private fun ValidateError(
-    authState: SignOutViewModel.AuthState,
+    authState: RegisterViewModel.AuthState,
     nameErrorMessage: MutableState<String>,
     surnameErrorMessage: MutableState<String>,
     usernameErrorMessage: MutableState<String>,
@@ -219,21 +213,21 @@ private fun ValidateError(
     passwordErrorMessage: MutableState<String>
 ) {
     when (authState) {
-        is SignOutViewModel.AuthState.Error -> {
+        is RegisterViewModel.AuthState.Error -> {
             nameErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.NAME }?.error
+                authState.errorField.find { it.signInField == RegisterViewModel.SignOutFieldInfo.NAME }?.error
                     ?: ""
             surnameErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.SURNAME }?.error
+                authState.errorField.find { it.signInField == RegisterViewModel.SignOutFieldInfo.SURNAME }?.error
                     ?: ""
             usernameErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.USERNAME }?.error
+                authState.errorField.find { it.signInField == RegisterViewModel.SignOutFieldInfo.USERNAME }?.error
                     ?: ""
             emailErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.EMAIL }?.error
+                authState.errorField.find { it.signInField == RegisterViewModel.SignOutFieldInfo.EMAIL }?.error
                     ?: ""
             passwordErrorMessage.value =
-                authState.errorField.find { it.signInField == SignOutViewModel.SignOutFieldInfo.PASSWORD }?.error
+                authState.errorField.find { it.signInField == RegisterViewModel.SignOutFieldInfo.PASSWORD }?.error
                     ?: ""
         }
         else -> Unit
@@ -241,7 +235,7 @@ private fun ValidateError(
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
-private fun signOut(
+private fun register(
     signOut: (String, String, String, String, String) -> Unit,
     name: MutableState<TextFieldValue>,
     surname: MutableState<TextFieldValue>,
