@@ -13,5 +13,5 @@ interface AuthService {
 
     @POST("/auth/register")
     @Headers("No-Authentication: true")
-    suspend fun signUp(@Body userRegisterRequest: UserRegisterRequest): Response<Unit>
+    suspend fun register(@Body userRegisterRequest: UserRegisterRequest): Response<Unit>
 }

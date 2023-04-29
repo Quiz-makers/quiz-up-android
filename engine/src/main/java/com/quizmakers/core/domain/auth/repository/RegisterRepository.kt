@@ -1,7 +1,7 @@
 package com.quizmakers.core.domain.auth.repository
 
-interface SignOutRepository {
-    suspend fun signOut(
+interface RegisterRepository {
+    suspend fun register(
         name: String,
         surname: String,
         userName: String,

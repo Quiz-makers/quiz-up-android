@@ -1,4 +1,4 @@
-package com.quizmakers.quizup.presentation.auth.signOut
+package com.quizmakers.quizup.presentation.auth.register
 
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -6,7 +6,7 @@ import com.quizmakers.core.api.exception.ErrorMapper
 import com.quizmakers.core.api.exception.ServerException
 import com.quizmakers.core.data.auth.remote.ErrorCatcher
 import com.quizmakers.core.data.auth.remote.Errors
-import com.quizmakers.core.domain.auth.useCases.CoreSignUpUseCase
+import com.quizmakers.core.domain.auth.useCases.CoreRegisterUseCase
 import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,20 +15,20 @@ import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
-class SignOutViewModel(
-    private val coreSignUpUseCase: CoreSignUpUseCase,
+class RegisterViewModel(
+    private val coreRegisterUseCase: CoreRegisterUseCase,
     private val errorMapper: ErrorMapper,
 ) : BaseViewModel() {
     private val _authState = MutableStateFlow<AuthState>(AuthState.None)
     val authState = _authState.asStateFlow()
 
-    fun signOut(name: String, surname: String, userName: String, email: String, password: String) {
+    fun register(name: String, surname: String, userName: String, email: String, password: String) {
         if (validate(name, surname, userName, email, password)) {
             viewModelScope.launch {
 
                 _authState.emit(AuthState.Loading)
                 runCatching {
-                    coreSignUpUseCase.invoke(name, surname, userName, email, password)
+                    coreRegisterUseCase.invoke(name, surname, userName, email, password)
                 }.onFailure {
                     errorMapper.map(it).also { errorMessage ->
                         sendMessageEvent(MessageEvent.Error(errorMessage))
