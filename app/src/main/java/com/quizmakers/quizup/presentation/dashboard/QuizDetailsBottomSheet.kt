@@ -15,9 +15,10 @@ import com.quizmakers.quizup.ui.common.BaseButtonWithIcon
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.spec.DestinationStyle
+import com.ramcosta.composedestinations.spec.DestinationStyleBottomSheet
 
 @Destination(
-    style = DestinationStyle.BottomSheet::class
+    style = DestinationStyleBottomSheet::class
 )
 @Composable
 fun QuizDetailsBottomSheet(navigator: DestinationsNavigator, quizId: String, desc: String) {

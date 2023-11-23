@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.quizmakers.quizup.core.navigation.AppNavigation
@@ -38,7 +38,7 @@ fun MainScreen(
             skipHalfExpanded = true
         )
         val bottomSheetNavigator = rememberBottomSheetNavigator(sheetState = sheetState)
-        val navController = rememberAnimatedNavController()
+        val navController = rememberNavController()
         val scope = rememberCoroutineScope()
         val snackbarState = SnackbarHandler(scope)
         navController.navigatorProvider.addNavigator(bottomSheetNavigator)

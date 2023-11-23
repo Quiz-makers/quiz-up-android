@@ -31,9 +31,9 @@ fun main() {
                 )
             )
         }.onFailure {
-            it
+
         }.onSuccess {
-            it
+
         }
     }
 }

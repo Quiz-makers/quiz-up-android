@@ -24,6 +24,7 @@ import com.ramcosta.composedestinations.spec.Route
 @ExperimentalAnimationApi
 @Composable
 internal fun AppNavigation(
+    modifier: Modifier = Modifier,
     engine: NavHostEngine = rememberAnimatedNavHostEngine(
         rootDefaultAnimations = RootNavGraphDefaultAnimations(
             enterTransition = { defaultSortEnterTransition(initialState, targetState) },
@@ -36,7 +37,6 @@ internal fun AppNavigation(
     onOpenSettings: @Composable DependenciesContainerBuilder<*>.() -> Unit = {},
     startRoute: Route,
     navGraph: NavGraphSpec,
-    modifier: Modifier = Modifier,
 
     ) {
     DestinationsNavHost(
@@ -95,7 +95,7 @@ object RootNavGraph : NavGraphSpec {
 }
 
 @ExperimentalAnimationApi
-private fun AnimatedContentScope<*>.defaultSortEnterTransition(
+private fun AnimatedContentTransitionScope<*>.defaultSortEnterTransition(
     initial: NavBackStackEntry,
     target: NavBackStackEntry,
 ): EnterTransition {
@@ -106,12 +106,12 @@ private fun AnimatedContentScope<*>.defaultSortEnterTransition(
         return fadeIn()
     }
     // Otherwise we're in the same nav graph, we can imply a direction
-    return fadeIn() + slideIntoContainer(AnimatedContentScope.SlideDirection.Start)
+    return fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start)
 }
 
 @ExperimentalAnimationApi
 
-private fun AnimatedContentScope<*>.defaultSortExitTransition(
+private fun AnimatedContentTransitionScope<*>.defaultSortExitTransition(
     initial: NavBackStackEntry,
     target: NavBackStackEntry,
 ): ExitTransition {
@@ -122,18 +122,18 @@ private fun AnimatedContentScope<*>.defaultSortExitTransition(
         return fadeOut()
     }
     // Otherwise we're in the same nav graph, we can imply a direction
-    return fadeOut() + slideOutOfContainer(AnimatedContentScope.SlideDirection.Start)
+    return fadeOut() + slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start)
 }
 
 private val NavDestination.hostNavGraph: NavGraph
     get() = hierarchy.first { it is NavGraph } as NavGraph
 
 @ExperimentalAnimationApi
-private fun AnimatedContentScope<*>.defaultTiviPopEnterTransition(): EnterTransition {
-    return fadeIn() + slideIntoContainer(AnimatedContentScope.SlideDirection.End)
+private fun AnimatedContentTransitionScope<*>.defaultTiviPopEnterTransition(): EnterTransition {
+    return fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End)
 }
 
 @ExperimentalAnimationApi
-private fun AnimatedContentScope<*>.defaultTiviPopExitTransition(): ExitTransition {
-    return fadeOut() + slideOutOfContainer(AnimatedContentScope.SlideDirection.End)
+private fun AnimatedContentTransitionScope<*>.defaultTiviPopExitTransition(): ExitTransition {
+    return fadeOut() + slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End)
 }
