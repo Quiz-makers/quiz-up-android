@@ -45,4 +45,16 @@
     <string name="signout_complite">Pomyślnie zażono konto! 🧁\n Teraz możesz się zalogować.</string>
     <string name="not_found">Nie znaleziono quizu lub zostal już dodany🙃</string>
     <string name="empty_array">W tym quizie nie ma pytań 🥺</string>
+    <string name="battle_mode_button_title">"Tryb Rywalizacji"</string>
+    <string name="actions">Twoje Akcje</string>
+    <string name="welcome_title_battle_mode">Witaj w trybie rywalizacji!</string>
+    <string name="search_for_player">Poszukujemy godnego przeciwnika dla Ciebie.</string>
+    <string name="search_opponent">Wyszukaj rywala</string>
+    <string name="search_player_for">Wyszukaj przeciwnika by zmierzyć się z nim na wiedzę.</string>
+    <string name="draw">Remis</string>
+    <string name="loser">Przegrana</string>
+    <string name="winner">Zwycięstwo!</string>
+    <string name="draw_info">Nie udało się roztrzygnąć kto został zwycięzcą.</string>
+    <string name="loser_info">Tym razem nie udało się wygrać. Spróbuj ponownie !</string>
+    <string name="winner_info">Udało ci się pokonać przeciwnika, gratulacje!</string>
 </resources>

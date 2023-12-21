@@ -159,6 +159,7 @@ fun BaseToggleButton(
 
 @Composable
 fun BaseTextFieldWithIcon(
+    color: Color = Color.Black,
     valueState: MutableState<TextFieldValue>,
     trailingIcon: ImageVector,
     placeholderText: String,
@@ -169,17 +170,18 @@ fun BaseTextFieldWithIcon(
     ),
 ) {
     OutlinedTextField(
+        colors = TextFieldDefaults.outlinedTextFieldColors(textColor = color),
         value = valueState.value,
         onValueChange = { newText ->
             valueState.value = newText
         },
-        placeholder = { Text(text = placeholderText) },
-        label = { Text(text = labelText) },
+        placeholder = { Text(text = placeholderText, color = color) },
+        label = { Text(text = labelText, color = color) },
         trailingIcon = {
             Icon(
                 imageVector = trailingIcon,
                 contentDescription = trailingIcon.name,
-                tint = Color.Black,
+                tint = color,
                 modifier = Modifier.size(30.dp)
             )
         },
@@ -213,7 +215,7 @@ fun BaseButton(label: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun BaseButtonWithIcon(modifier: Modifier, label: String, icon: ImageVector, onClick: () -> Unit) {
+fun BaseButtonWithIcon(modifier: Modifier, label: String, icon: ImageVector?, onClick: () -> Unit) {
     Button(
         modifier = Modifier
             .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp))
@@ -236,12 +238,14 @@ fun BaseButtonWithIcon(modifier: Modifier, label: String, icon: ImageVector, onC
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = label, color = Color.White, fontWeight = FontWeight.Medium)
-            Icon(
-                imageVector = icon,
-                contentDescription = icon.name,
-                tint = Color.White,
-                modifier = Modifier.size(30.dp)
-            )
+            icon?.let {
+                Icon(
+                    imageVector = it,
+                    contentDescription = icon.name,
+                    tint = Color.White,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
         }
 
     }
