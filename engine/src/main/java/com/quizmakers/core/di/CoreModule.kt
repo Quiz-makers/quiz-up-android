@@ -8,6 +8,7 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.chuckerteam.chucker.api.RetentionManager
 import com.quizmakers.core.api.Server
 import com.quizmakers.core.api.interceptors.AuthInterceptor
+import com.quizmakers.core.api.interceptors.BearerTokenInterceptor
 import com.quizmakers.core.api.nullOnEmptyConverterFactory
 import com.quizmakers.core.base.AUTH_CHANNEL_SP
 import com.quizmakers.core.data.quizzes.remote.QuizzesService
@@ -82,7 +83,12 @@ class CoreModule {
     fun provideQuizUpApiService(retrofit: Retrofit): QuizzesService =
         retrofit.create(QuizzesService::class.java)
 
+    @Single
+    fun provideBearerTokenInterceptor(sharedPreferences: SharedPreferences): BearerTokenInterceptor =
+        BearerTokenInterceptor(sharedPreferences)
+
 }
+
 
 @Single
 class StartedModule() {}

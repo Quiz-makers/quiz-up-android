@@ -58,6 +58,7 @@ fun QuizScreen(
                 is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
+
                 BaseViewModel.MessageEvent.Success -> Unit
             }
         }
@@ -111,6 +112,7 @@ private fun QuizScreen(
             is QuizScreenViewModel.QuizState.Error -> ErrorScreen {
                 refresh()
             }
+
             QuizScreenViewModel.QuizState.Loading -> LoadingScreen()
             QuizScreenViewModel.QuizState.None -> Unit
             is QuizScreenViewModel.QuizState.Success -> {
@@ -121,6 +123,7 @@ private fun QuizScreen(
                         navToDashboardScreen = closeQuiz,
                         finishQuiz = finishQuiz
                     )
+
                     false ->
                         QuizLayout(
                             quizJustEnd = quizJustEnd,
@@ -139,7 +142,6 @@ private fun QuizScreen(
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun QuizSummary(
     score: MutableState<Int>,
