@@ -19,7 +19,8 @@ fun QuizResponse.toQuizDisplayable() = QuizDisplayable(
                     isCorrect = answer.isCorrect,
                 )
             },
-            image = it.imageBase64?.takeIf { image -> image.isNotBlank() }?.decodeImage()
+            image = it.imageBase64?.takeIf { image -> image.isNotBlank() && image != "null" }
+                ?.decodeImage()
         )
     })
 

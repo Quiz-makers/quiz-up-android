@@ -30,6 +30,6 @@ interface QuizzesService {
     @GET("/quizapp/start/{id}")
     suspend fun startQuiz(@Path("id") id: String): QuizResponse
 
-    @GET("/quizapp/quiz/generate/fromTitle")
+    @POST("/quizapp/quiz/generate/fromTitle")
     suspend fun generateQuiz(@Body quizGenerateRequest: QuizGenerateRequest): Response<Unit>
 }
