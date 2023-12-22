@@ -15,7 +15,7 @@ data class QuestionApi(
     val questionId: Int,
     val question: String,
     val answerDtoSet: List<AnswerApi>,
-    @SerializedName("image") val imageBase64: String?
+    @SerializedName("image") val imageBase64: String? = null
 )
 
 //
@@ -131,4 +131,15 @@ data class AuthResponseApi(
     val name: String?,
     val surname: String?,
     val userName: String
+)
+data class QuizGenerateRequest(
+    val title: String,
+    val type: Int,
+    val categoryId: Int,
+    val numberOfQuestions: Int,
+    val answersPerQuestion: Int,
+    val publicAvailable: Boolean,
+    val quizTime: String?,
+    val startsAt: String?,
+    val endsAt: String?
 )

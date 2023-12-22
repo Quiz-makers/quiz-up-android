@@ -41,6 +41,7 @@ import com.quizmakers.quizup.R
 import com.quizmakers.quizup.core.base.BaseViewModel
 import com.quizmakers.quizup.presentation.dashboard.DashboardScreenViewModel.DashboardState
 import com.quizmakers.quizup.presentation.destinations.BattleScreenDestination
+import com.quizmakers.quizup.presentation.destinations.GenerateQuizAiScreenDestination
 import com.quizmakers.quizup.presentation.destinations.QuizDetailsBottomSheetDestination
 import com.quizmakers.quizup.presentation.destinations.QuizManagerScreenDestination
 import com.quizmakers.quizup.presentation.destinations.SignInScreenDestination
@@ -67,6 +68,7 @@ fun DashboardScreen(
                 is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
+
                 BaseViewModel.MessageEvent.Success -> {
                     snackbarHandler.showSuccessSnackbar(R.string.add_quiz_success)
                 }
@@ -84,7 +86,8 @@ fun DashboardScreen(
         dashboardState = dashboardScreenViewModel.dashboardState.collectAsStateWithLifecycle().value,
         userName = dashboardScreenViewModel.getUserName(),
         getQuizByCode = dashboardScreenViewModel::getQuizByCode,
-        navigateBattleScreen = navigator::navigateBattleScreenScreen
+        navigateBattleScreen = navigator::navigateBattleScreenScreen,
+        navigateGenerateScreen = navigator::navigateGenerateScreen
     )
 }
 
@@ -96,6 +99,7 @@ private fun DashboardScreen(
     onRefresh: () -> Unit,
     dashboardState: DashboardState,
     navigateQuizManagerScreen: () -> Unit,
+    navigateGenerateScreen: () -> Unit,
     userName: String,
     getQuizByCode: (String) -> Unit,
 ) {
@@ -129,7 +133,8 @@ private fun DashboardScreen(
                         boxSizeUser = boxSizeUser,
                         navigateToQuizDetailsBottomSheet = navigateToQuizDetailsBottomSheet,
                         getQuizByCode = getQuizByCode,
-                        navigateBattleScreen = navigateBattleScreen
+                        navigateBattleScreen = navigateBattleScreen,
+                        navigateGenerateScreen = navigateGenerateScreen
                     )
                 }
             }
@@ -149,6 +154,7 @@ private fun DashboardData(
     navigateQuizManagerScreen: () -> Unit,
     navigateBattleScreen: () -> Unit,
     getQuizByCode: (String) -> Unit,
+    navigateGenerateScreen: () -> Unit,
 ) {
 
     val search = remember { mutableStateOf(TextFieldValue("")) }
@@ -172,6 +178,13 @@ private fun DashboardData(
                 label = stringResource(R.string.add_new_quiz),
                 icon = Icons.Default.Add,
                 onClick = navigateQuizManagerScreen,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            BaseButtonWithIcon(
+                label = stringResource(R.string.generate_quiz),
+                icon = Icons.Default.Build,
+                onClick = navigateGenerateScreen,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -354,6 +367,9 @@ private fun DestinationsNavigator.navigateBattleScreenScreen() {
     navigate(BattleScreenDestination())
 }
 
+private fun DestinationsNavigator.navigateGenerateScreen() {
+    navigate(GenerateQuizAiScreenDestination())
+}
 
 @Preview(
     showBackground = true
@@ -361,6 +377,6 @@ private fun DestinationsNavigator.navigateBattleScreenScreen() {
 @Composable
 private fun DashboardScreenPreview() {
     QuizUpTheme {
-        DashboardScreen({}, {}, {}, {}, DashboardState.None, { }, "", {})
+        DashboardScreen({}, {}, {}, {}, DashboardState.None, { }, {}, "", {})
     }
 }
