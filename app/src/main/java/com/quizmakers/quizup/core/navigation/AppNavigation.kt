@@ -75,7 +75,8 @@ object NavGraphs {
             BattleScreenDestination,
             QuizManagerScreenDestination,
             QuizDetailsBottomSheetDestination,
-            QuizScreenDestination
+            QuizScreenDestination,
+            GenerateQuizAiScreenDestination
         ).associateBy { it.route }
     }
 }

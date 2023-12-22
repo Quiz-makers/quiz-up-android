@@ -57,4 +57,7 @@
     <string name="draw_info">Nie udało się roztrzygnąć kto został zwycięzcą.</string>
     <string name="loser_info">Tym razem nie udało się wygrać. Spróbuj ponownie !</string>
     <string name="winner_info">Udało ci się pokonać przeciwnika, gratulacje!</string>
+    <string name="generate_quiz">Wygeneruj Quiz </string>
+    <string name="wybierz_liczb_pyta">Wybierz liczbę pytań</string>
+    <string name="numer_of_anwer">Wybierz ilość odpowiedzi na pytanie</string>
 </resources>

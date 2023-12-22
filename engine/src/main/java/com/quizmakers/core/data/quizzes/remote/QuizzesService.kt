@@ -29,4 +29,7 @@ interface QuizzesService {
 
     @GET("/quizapp/start/{id}")
     suspend fun startQuiz(@Path("id") id: String): QuizResponse
+
+    @POST("/quizapp/quiz/generate/fromTitle")
+    suspend fun generateQuiz(@Body quizGenerateRequest: QuizGenerateRequest): Response<Unit>
 }

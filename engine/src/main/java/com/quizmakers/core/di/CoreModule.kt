@@ -20,6 +20,7 @@ import org.koin.core.annotation.Single
 import retrofit2.Retrofit
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 @Module
 @ComponentScan("com.quizmakers.core")
@@ -27,6 +28,7 @@ class CoreModule {
     @Single
     fun provideRetrofit(client: OkHttpClient) = Retrofit.Builder()
         .callFactory(client)
+        .client(client)
         .baseUrl(Server.BASE_URL)
         .addConverterFactory(nullOnEmptyConverterFactory)
         .addConverterFactory(GsonConverterFactory.create())
@@ -69,6 +71,10 @@ class CoreModule {
         interceptor: HttpLoggingInterceptor,
         chuckerInterceptor: ChuckerInterceptor
     ) = OkHttpClient.Builder()
+        .connectTimeout(20, TimeUnit.SECONDS)
+        .callTimeout(40, TimeUnit.SECONDS)
+        .readTimeout(20, TimeUnit.SECONDS)
+        .writeTimeout(20, TimeUnit.SECONDS)
         .addInterceptor(authInterceptor)
         .addInterceptor(interceptor)
         .addInterceptor(chuckerInterceptor)

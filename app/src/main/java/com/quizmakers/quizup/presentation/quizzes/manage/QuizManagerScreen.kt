@@ -66,6 +66,7 @@ fun QuizManagerScreen(
                 is BaseViewModel.MessageEvent.Error -> {
                     snackbarHandler.showErrorSnackbar(message = it.error)
                 }
+
                 BaseViewModel.MessageEvent.Success -> {
                     snackbarHandler.showSuccessSnackbar(R.string.add_quiz_success)
                     navigator.navigateUp()
@@ -124,7 +125,6 @@ private fun QuizManagerScreen(
 }
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class)
 private fun AddQuizLayout(
     categories: List<CategoryApi>,
     addNewQuiz: (String, String, Boolean, Int, QuestionsRequestApi) -> Unit,
@@ -221,60 +221,6 @@ private fun AddQuizLayout(
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-        }
-    }
-}
-
-
-@Composable
-private fun SpinnerCategory(
-    selectedCategory: MutableState<Pair<Int, String>>,
-    expanded: MutableState<Boolean>,
-    categories: List<CategoryApi>
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                BorderStroke(1.dp, Color.Gray), shape = RoundedCornerShape(10.dp)
-            )
-            .background(
-                shape = RoundedCornerShape(10.dp), color = LightBlue
-            )
-            .padding(10.dp, 0.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = if (selectedCategory.value.second.isNotBlank()) selectedCategory.value.second else stringResource(
-                R.string.add_category
-            ),
-            color = if (selectedCategory.value.second.isNotBlank()) Color.Black else Color.Gray,
-            fontSize = 14.sp
-        )
-        IconButton(
-            onClick = { expanded.value = true }, modifier = Modifier.clip(CircleShape)
-        ) {
-            Icon(
-                imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = Icons.Default.ArrowDropDown.name,
-                tint = DarkBlue,
-                modifier = Modifier.size(30.dp)
-            )
-        }
-    }
-    DropdownMenu(
-        expanded = expanded.value,
-        onDismissRequest = { expanded.value = false },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        categories.forEach { value ->
-            DropdownMenuItem(onClick = {
-                selectedCategory.value = Pair(value.categoryId, value.category)
-                expanded.value = false
-            }) {
-                Text(value.category, fontSize = 12.sp)
-            }
         }
     }
 }
