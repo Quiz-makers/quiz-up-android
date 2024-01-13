@@ -15,20 +15,19 @@ class QuizzesRepositoryImpl(
 ) : QuizzesRepository {
     override suspend fun getPublicQuizzes(): List<QuizGeneralDisplayable> {
         return callOrThrow(errorWrapper) {
-            api.getPublicQuizzes().map { it.toQuizDisplayable() }
-            //  .toMutableList().also { it.add(mockQuiz.toQuizDisplayable()) }
+            api.getPublicQuizzes().map { it.toQuizDisplayable(false) }
         }
     }
 
     override suspend fun getUserQuizzes(): List<QuizGeneralDisplayable> {
         return callOrThrow(errorWrapper) {
-            api.getUserQuizzes().map { it.toQuizDisplayable() }
+            api.getUserQuizzes().map { it.toQuizDisplayable(true) }
         }
     }
 
     override suspend fun getQuizByCode(code: String): QuizGeneralDisplayable =
         callOrThrow(errorWrapper) {
-            api.getQuizByCode(quizCode = code).toQuizDisplayable()
+            api.getQuizByCode(quizCode = code).toQuizDisplayable(true)
         }
 
 }

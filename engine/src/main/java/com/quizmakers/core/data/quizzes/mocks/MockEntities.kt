@@ -22,6 +22,7 @@ var mockQuiz = QuizResponseApi(
     ownerName = "John",
     ownerSurname = "Doe",
     quizTime = 20,
+    quizCode = "20",
     description = "This quiz will test your knowledge on the major events and figures of World War II.",
 )
 val mockedQuestion = listOf(

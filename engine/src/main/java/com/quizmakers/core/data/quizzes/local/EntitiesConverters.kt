@@ -24,8 +24,9 @@ fun QuizResponse.toQuizDisplayable() = QuizDisplayable(
         )
     })
 
-fun QuizResponseApi.toQuizDisplayable() = QuizGeneralDisplayable(
+fun QuizResponseApi.toQuizDisplayable(isExpandedMode: Boolean) = QuizGeneralDisplayable(
     quizId = quizId,
     title = title,
+    quizShareCode = if (isExpandedMode) quizCode else null,
     description = description,
 )

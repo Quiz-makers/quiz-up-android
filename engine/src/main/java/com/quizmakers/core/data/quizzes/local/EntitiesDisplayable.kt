@@ -26,4 +26,5 @@ data class QuizGeneralDisplayable(
     val quizId: Int,
     val title: String,
     val description: String,
+    val quizShareCode: String?,
 )

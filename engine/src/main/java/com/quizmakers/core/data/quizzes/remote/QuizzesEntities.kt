@@ -77,6 +77,7 @@ data class QuizResponseApi(
     val ownerSurname: String?,
     val quizTime: Int?,
     val description: String,
+    val quizCode: String?,
 )
 
 data class QuestionsRequestApi(
@@ -97,7 +98,7 @@ fun QuestionsRequestApi.toQuizQuestionApi(): Map<String, QuizQuestionApi> =
         "q$i" to QuizQuestionApi(
             type = "1",
             question = questions[i],
-            questionImages = image[i] ?: "",
+            questionImages = image[i]?.replace("\n","") ?: "",
             score = 1,
             difficulty = 1,
             visible = true,

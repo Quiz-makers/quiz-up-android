@@ -51,7 +51,7 @@ class DashboardScreenViewModel(
         viewModelScope.launch {
             _dashboardState.emit(DashboardState.Loading)
             runCatching {
-                Pair(coreGetPublicQuizzesUseCase.invoke(), coreGetUserQuizzesUseCase.invoke())
+                Pair(coreGetPublicQuizzesUseCase(), coreGetUserQuizzesUseCase())
             }.onFailure {
                 errorMapper.map(it).also { errorMessage ->
                     sendMessageEvent(MessageEvent.Error(errorMessage))

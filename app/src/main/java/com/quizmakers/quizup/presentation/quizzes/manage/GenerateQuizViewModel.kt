@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
+import java.net.SocketTimeoutException
 
 @KoinViewModel
 class GenerateQuizViewModel(
@@ -57,9 +58,14 @@ class GenerateQuizViewModel(
                     )
                 )
             }.onFailure {
-                errorMapper.map(it).also { errorMessage ->
-                    sendMessageEvent(MessageEvent.Error(errorMessage))
-                    _addedState.emit(AddQuizState.Loaded)
+                if (it is SocketTimeoutException) {
+                    sendMessageEvent(MessageEvent.Error("Zbyt długi czas oczekiwania.⌛️ Quiz pojawi się po czasie na ekranie startowym..."))
+
+                } else {
+                    errorMapper.map(it).also { errorMessage ->
+                        sendMessageEvent(MessageEvent.Error(errorMessage))
+                        _addedState.emit(AddQuizState.Loaded)
+                    }
                 }
             }.onSuccess {
                 sendMessageEvent(MessageEvent.Success)

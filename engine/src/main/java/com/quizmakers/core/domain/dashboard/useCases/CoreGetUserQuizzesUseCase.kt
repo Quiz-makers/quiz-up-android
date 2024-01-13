@@ -9,9 +9,3 @@ class CoreGetUserQuizzesUseCase(
 ) {
     suspend operator fun invoke() = quizzesRepository.getUserQuizzes()
 }
-
-private fun generateMock(): List<String> {
-    return MutableList(4) { index ->
-        "Geografia"
-    }
-}
