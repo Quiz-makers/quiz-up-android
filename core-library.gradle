@@ -28,6 +28,9 @@ android {
     kotlinOptions {
         jvmTarget = rootProject.ext.jvmVersion
     }
+    kotlin {
+        jvmToolchain(17)
+    }
     testOptions {
         unitTests.all {
             useJUnitPlatform()
